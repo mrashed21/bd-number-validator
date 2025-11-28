@@ -1,8 +1,6 @@
 import React from "react";
 import "./bd-phone.css";
-import FLAG from "./flag.svg";
 import { useBDPhone } from "./useBDPhone";
-const BD_FLAG = FLAG;
 interface BDPhoneInputProps {
   value?: string;
   onValueChange?: (v?: string) => void;
@@ -42,12 +40,17 @@ export function BDPhoneInput({
       <label className={labelClass}>{label}</label>
 
       <div className={`${inputBoxClass} ${!isValid ? "bdp-error-border" : ""}`}>
-        <img src={BD_FLAG} className="bdp-flag" />
+        <div className="bdp-flag">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 20">
+            <rect width="30" height="20" fill="#006a4e" />
+            <circle cx="12.5" cy="10" r="5" fill="#f42a41" />
+          </svg>
+        </div>
         <span className="bdp-prefix">+880</span>
 
         <input
           className={inputClass}
-          placeholder="1XXXXXXXXX"
+          placeholder="enter phone number"
           value={raw}
           onChange={(e) => onChange(e.target.value)}
         />

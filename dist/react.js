@@ -1,9 +1,6 @@
 // src/react/BDPhoneInput.tsx
 import React from "react";
 
-// src/react/flag.svg
-var flag_default = "./flag-3WJGD64X.svg";
-
 // src/react/useBDPhone.ts
 import { useState } from "react";
 
@@ -66,7 +63,6 @@ function useBDPhone(initial = "") {
 
 // src/react/BDPhoneInput.tsx
 import { jsx, jsxs } from "react/jsx-runtime";
-var BD_FLAG = flag_default;
 function BDPhoneInput({
   value,
   onValueChange,
@@ -86,13 +82,16 @@ function BDPhoneInput({
   return /* @__PURE__ */ jsxs("div", { className: `${wrapperClass} ${className}`, children: [
     /* @__PURE__ */ jsx("label", { className: labelClass, children: label }),
     /* @__PURE__ */ jsxs("div", { className: `${inputBoxClass} ${!isValid ? "bdp-error-border" : ""}`, children: [
-      /* @__PURE__ */ jsx("img", { src: BD_FLAG, className: "bdp-flag" }),
+      /* @__PURE__ */ jsx("div", { className: "bdp-flag", children: /* @__PURE__ */ jsxs("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 30 20", children: [
+        /* @__PURE__ */ jsx("rect", { width: "30", height: "20", fill: "#006a4e" }),
+        /* @__PURE__ */ jsx("circle", { cx: "12.5", cy: "10", r: "5", fill: "#f42a41" })
+      ] }) }),
       /* @__PURE__ */ jsx("span", { className: "bdp-prefix", children: "+880" }),
       /* @__PURE__ */ jsx(
         "input",
         {
           className: inputClass,
-          placeholder: "1XXXXXXXXX",
+          placeholder: "enter phone number",
           value: raw,
           onChange: (e) => onChange(e.target.value)
         }

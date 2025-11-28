@@ -38,9 +38,6 @@ module.exports = __toCommonJS(react_exports);
 // src/react/BDPhoneInput.tsx
 var import_react2 = __toESM(require("react"), 1);
 
-// src/react/flag.svg
-var flag_default = "./flag-3WJGD64X.svg";
-
 // src/react/useBDPhone.ts
 var import_react = require("react");
 
@@ -103,7 +100,6 @@ function useBDPhone(initial = "") {
 
 // src/react/BDPhoneInput.tsx
 var import_jsx_runtime = require("react/jsx-runtime");
-var BD_FLAG = flag_default;
 function BDPhoneInput({
   value,
   onValueChange,
@@ -123,13 +119,16 @@ function BDPhoneInput({
   return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: `${wrapperClass} ${className}`, children: [
     /* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", { className: labelClass, children: label }),
     /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: `${inputBoxClass} ${!isValid ? "bdp-error-border" : ""}`, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", { src: BD_FLAG, className: "bdp-flag" }),
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "bdp-flag", children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 30 20", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("rect", { width: "30", height: "20", fill: "#006a4e" }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("circle", { cx: "12.5", cy: "10", r: "5", fill: "#f42a41" })
+      ] }) }),
       /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "bdp-prefix", children: "+880" }),
       /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
         "input",
         {
           className: inputClass,
-          placeholder: "1XXXXXXXXX",
+          placeholder: "enter phone number",
           value: raw,
           onChange: (e) => onChange(e.target.value)
         }
