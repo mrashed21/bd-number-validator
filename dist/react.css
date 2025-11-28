@@ -1,0 +1,46 @@
+/* src/react/bd-phone.css */
+.bdp-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+.bdp-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+.bdp-input-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  padding: 12px;
+  border-radius: 8px;
+  transition: 0.2s border ease;
+}
+.bdp-error-border {
+  border-color: #ef4444 !important;
+}
+.bdp-flag {
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+}
+.bdp-prefix {
+  font-weight: 700;
+  color: #1f2937;
+}
+.bdp-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 16px;
+  color: #111827;
+}
+.bdp-error-text {
+  font-size: 14px;
+  color: #dc2626;
+}
