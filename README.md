@@ -311,7 +311,7 @@ MIT © Muhammad Rashed
 
 ## 🤝 Contributing
 
-Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/yourusername/bd-number-validator/issues).
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/mrashed21/bd-number-validator.git/issues).
 
 ---
 
