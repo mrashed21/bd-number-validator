@@ -7,7 +7,25 @@
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
-
+  "keywords": [
+    "bangladesh phone validator",
+    "bd phone validator",
+    "bd number validator",
+    "bangladesh mobile validator",
+    "phone validator bd",
+    "react bd phone input",
+    "react bangladesh input",
+    "bd phone input",
+    "bangladesh phone number",
+    "bd mobile number",
+    "mobile number validation",
+    "react phone component",
+    "react tailwind input",
+    "bd-number-validator",
+    "bangla phone validator",
+    "mrashed21",
+    "Muhammad Rashed"
+  ],
   "exports": {
     ".": {
       "import": "./dist/index.js",
@@ -19,19 +37,17 @@
     },
     "./dist/*": "./dist/*"
   },
-
-  "files": ["dist"],
-
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
     "prepare": "npm run build"
   },
-
   "peerDependencies": {
     "react": ">=18 <20",
     "react-dom": ">=18 <20"
   },
-
   "devDependencies": {
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
