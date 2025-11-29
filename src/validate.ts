@@ -14,22 +14,25 @@ export interface PhoneValidationResult {
 }
 
 export function validatePhoneNumber(input: string): PhoneValidationResult {
-  if (!input) return { isValid: true };
+  if (!input || input.trim() === "") {
+    return { isValid: true };
+  }
 
   let raw = input.replace(/[^0-9]/g, "");
 
-  if (raw.length < 4) {
+  if (raw.length < 10) {
     return { isValid: true };
+  }
+
+  if (raw.length === 10 && raw.startsWith("1")) {
+    raw = "0" + raw;
   }
 
   if (raw.startsWith("880") && raw.length === 13) {
     raw = "0" + raw.slice(3);
-  } else if (raw.length === 10 && raw.startsWith("1")) {
-    raw = "0" + raw;
-  } else if (
-    !(raw.length === 11 && raw.startsWith("01")) &&
-    !raw.startsWith("880")
-  ) {
+  }
+
+  if (!(raw.length === 11 && raw.startsWith("01"))) {
     return { isValid: false, error: "Invalid number format" };
   }
 
@@ -45,7 +48,6 @@ export function validatePhoneNumber(input: string): PhoneValidationResult {
   };
 
   let operator: Operator = "Unknown";
-
   for (const [op, arr] of Object.entries(operators)) {
     if (arr.includes(prefix)) operator = op as Operator;
   }
@@ -56,7 +58,7 @@ export function validatePhoneNumber(input: string): PhoneValidationResult {
 
   return {
     isValid: true,
-    normalized: "+880" + raw.substring(1),
+    normalized: "+880" + raw.slice(1),
     operator,
   };
 }

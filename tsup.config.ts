@@ -8,13 +8,10 @@ export default defineConfig({
   format: ["esm", "cjs"],
   dts: true,
   clean: true,
-  injectStyle: false,
-  splitting: false,
+  injectStyle: true,
 
   loader: {
-    ".svg": "file",
     ".css": "css",
+    ".svg": "file",
   },
-
-  onSuccess: "cpy src/react/bd-phone.css dist/",
 });

@@ -4,12 +4,9 @@ import { useBDPhone } from "./useBDPhone";
 interface BDPhoneInputProps {
   value?: string;
   onValueChange?: (v?: string) => void;
-
   showError?: boolean;
   customError?: (err: string) => React.ReactNode;
-
   label?: string;
-
   className?: string;
   wrapperClass?: string;
   inputBoxClass?: string;
@@ -39,7 +36,11 @@ export function BDPhoneInput({
     <div className={`${wrapperClass} ${className}`}>
       <label className={labelClass}>{label}</label>
 
-      <div className={`${inputBoxClass} ${!isValid ? "bdp-error-border" : ""}`}>
+      <div
+        className={`${inputBoxClass} ${
+          !isValid && raw ? "bdp-error-border" : ""
+        }`}
+      >
         <div className="bdp-flag">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 20">
             <rect width="30" height="20" fill="#006a4e" />
