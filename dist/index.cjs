@@ -1,9 +1,7 @@
 "use strict";
-var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
-var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __export = (target, all) => {
   for (var name in all)
@@ -17,14 +15,6 @@ var __copyProps = (to, from, except, desc) => {
   }
   return to;
 };
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
-  // If the importer is in node compatibility mode or this is not an ESM
-  // file that has been converted to a CommonJS file using a Babel-
-  // compatible transform (i.e. "__esModule" has not been set), then set
-  // "default" to the CommonJS "module.exports" for node compatibility.
-  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
-  mod
-));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
 // src/index.ts
@@ -37,69 +27,18 @@ __export(src_exports, {
 module.exports = __toCommonJS(src_exports);
 
 // src/react/BDPhoneInput.tsx
-var import_react2 = __toESM(require("react"), 1);
-
-// #style-inject:#style-inject
-function styleInject(css, { insertAt } = {}) {
-  if (!css || typeof document === "undefined")
-    return;
-  const head = document.head || document.getElementsByTagName("head")[0];
-  const style = document.createElement("style");
-  style.type = "text/css";
-  if (insertAt === "top") {
-    if (head.firstChild) {
-      head.insertBefore(style, head.firstChild);
-    } else {
-      head.appendChild(style);
-    }
-  } else {
-    head.appendChild(style);
-  }
-  if (style.styleSheet) {
-    style.styleSheet.cssText = css;
-  } else {
-    style.appendChild(document.createTextNode(css));
-  }
-}
-
-// src/react/bd-phone.css
-styleInject(".bdp-wrapper {\n  display: flex;\n  flex-direction: column;\n  gap: 4px;\n  width: 100%;\n}\n.bdp-label {\n  font-size: 14px;\n  font-weight: 500;\n  color: #374151;\n}\n.bdp-input-box {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  background: #ffffff;\n  border: 1px solid #d1d5db;\n  padding: 12px;\n  border-radius: 8px;\n  transition: 0.2s border ease;\n}\n.bdp-error-border {\n  border-color: #ef4444 !important;\n}\n.bdp-flag {\n  width: 30px;\n  height: 25px;\n  border-radius: 3px;\n}\n.bdp-prefix {\n  font-weight: 700;\n  color: #1f2937;\n}\n.bdp-input {\n  flex: 1;\n  border: none;\n  outline: none;\n  background: transparent;\n  font-size: 16px;\n  color: #111827;\n}\n.bdp-error-text {\n  font-size: 14px;\n  color: #dc2626;\n}\n");
+var import_react2 = require("react");
 
 // src/react/formatBDPhoneUI.ts
 function formatBDPhoneUI(raw) {
   if (!raw)
     return "";
   const digits = raw.replace(/\D/g, "");
-  if (digits.startsWith("880")) {
-    if (digits.length <= 3)
-      return digits;
-    if (digits.length <= 4)
-      return `${digits.slice(0, 3)} ${digits.slice(3)}`;
-    if (digits.length <= 7)
-      return `${digits.slice(0, 3)} ${digits.slice(3)}`;
-    if (digits.length <= 8)
-      return `${digits.slice(0, 3)} ${digits.slice(3, 7)} ${digits.slice(7)}`;
-    return `${digits.slice(0, 3)} ${digits.slice(3, 7)} ${digits.slice(7)}`;
-  }
-  if (digits.startsWith("01")) {
-    if (digits.length <= 3)
-      return digits;
-    if (digits.length <= 7)
-      return `${digits.slice(0, 3)} ${digits.slice(3)}`;
-    return `${digits.slice(0, 3)} ${digits.slice(3, 7)} ${digits.slice(7)}`;
-  }
-  if (digits.startsWith("1")) {
-    if (digits.length <= 2)
-      return digits;
-    if (digits.length <= 6)
-      return `${digits.slice(0, 2)} ${digits.slice(2)}`;
-    return `${digits.slice(0, 2)} ${digits.slice(2, 6)} ${digits.slice(6)}`;
-  }
   if (digits.length <= 3)
     return digits;
   if (digits.length <= 7)
     return `${digits.slice(0, 3)} ${digits.slice(3)}`;
-  return `${digits.slice(0, 3)} ${digits.slice(3, 7)} ${digits.slice(7)}`;
+  return `${digits.slice(0, 3)} ${digits.slice(3, 7)} ${digits.slice(7, 13)}`;
 }
 
 // src/react/useBDPhone.ts
@@ -107,32 +46,30 @@ var import_react = require("react");
 
 // src/validate.ts
 function validatePhoneNumber(input) {
-  console.log(input);
   if (!input || input.trim() === "") {
-    return { isValid: false };
+    return { isValid: true };
   }
   let value = input.replace(/[^0-9]/g, "");
   let raw = "";
   if (value.startsWith("8801")) {
     raw = value.slice(2);
   } else if (value.startsWith("880")) {
-    raw = value.slice(2);
-  } else if (value.startsWith("80")) {
+    raw = "0" + value.slice(3);
+  } else if (value.startsWith("801")) {
     raw = value.slice(1);
+  } else if (value.startsWith("80")) {
+    raw = "0" + value.slice(2);
   } else if (value.startsWith("0")) {
     raw = value;
-  } else if (value.startsWith("1")) {
-    raw = "0" + value;
   } else {
-    return { isValid: false, error: "Invalid number format" };
+    raw = "0" + value;
   }
   const operators = {
     Grameenphone: ["017", "013"],
     Banglalink: ["019", "014"],
     Robi: ["018"],
     Airtel: ["016"],
-    Teletalk: ["015"],
-    Unknown: []
+    Teletalk: ["015"]
   };
   let operator = "Unknown";
   if (raw.length >= 3) {
@@ -160,11 +97,11 @@ function validatePhoneNumber(input) {
     return { isValid: false, error: "Invalid number" };
   }
   if (raw.length === 11) {
+    const normalized = "+880" + raw.slice(1);
     return {
       isValid: true,
       operator,
-      normalized: "+880" + raw.slice(1)
-      // Remove leading 0, add +880
+      normalized
     };
   }
   return { isValid: false, error: "Invalid number" };
@@ -194,57 +131,99 @@ function BDPhoneInput({
   value,
   onValueChange,
   showError = true,
-  customError,
-  label = "",
-  className = "",
-  wrapperClass = "bdp-wrapper",
-  inputBoxClass = "bdp-input-box",
-  inputClass = "bdp-input",
-  labelClass = "bdp-label"
+  label = "Phone Number",
+  showLabel = true,
+  labelClass = "",
+  renderLabel,
+  containerClass = "",
+  wrapperClass = "",
+  flagClass = "",
+  prefixClass = "",
+  inputClass = "",
+  errorClass = "",
+  renderFlag,
+  renderPrefix,
+  renderError
 }) {
   const { raw, onChange, error, isValid, normalized } = useBDPhone(value != null ? value : "");
-  console.log("error: ", error);
-  console.log("raw: ", raw);
-  console.log("onChange: ", onChange);
-  console.log("isValid: ", isValid);
-  console.log("normalized: ", normalized);
-  const inputRef = import_react2.default.useRef(null);
+  const inputRef = (0, import_react2.useRef)(null);
+  const cursorPositionRef = (0, import_react2.useRef)(0);
   const handleChange = (e) => {
     var _a;
-    const cursor = (_a = e.target.selectionStart) != null ? _a : 0;
-    const before = formatBDPhoneUI(raw);
-    const newDigits = e.target.value.replace(/\D/g, "");
-    onChange(newDigits);
-    const after = formatBDPhoneUI(newDigits);
-    requestAnimationFrame(() => {
-      const input = inputRef.current;
-      if (!input)
-        return;
-      const diff = after.length - before.length;
-      input.selectionStart = input.selectionEnd = cursor + diff;
-    });
+    const input = e.target;
+    const cursorPos = (_a = input.selectionStart) != null ? _a : 0;
+    const newValue = e.target.value;
+    const newDigits = newValue.replace(/\D/g, "");
+    let maxLength;
+    if (newDigits.startsWith("8801"))
+      maxLength = 15;
+    else if (newDigits.startsWith("880"))
+      maxLength = 15;
+    else if (newDigits.startsWith("801"))
+      maxLength = 15;
+    else if (newDigits.startsWith("80"))
+      maxLength = 15;
+    else if (newDigits.startsWith("0"))
+      maxLength = 11;
+    else
+      maxLength = 10;
+    const limitedDigits = newDigits.slice(0, maxLength);
+    let digitsBeforeCursor = 0;
+    for (let i = 0; i < cursorPos && i < newValue.length; i++) {
+      if (/\d/.test(newValue[i]))
+        digitsBeforeCursor++;
+    }
+    onChange(limitedDigits);
+    const newFormatted = formatBDPhoneUI(limitedDigits);
+    let newCursorPos = 0;
+    let digitCount = 0;
+    for (let i = 0; i < newFormatted.length; i++) {
+      if (/\d/.test(newFormatted[i])) {
+        digitCount++;
+        if (digitCount >= digitsBeforeCursor) {
+          newCursorPos = i + 1;
+          break;
+        }
+      }
+    }
+    if (digitCount < digitsBeforeCursor) {
+      newCursorPos = newFormatted.length;
+    }
+    cursorPositionRef.current = newCursorPos;
   };
-  import_react2.default.useEffect(() => {
+  (0, import_react2.useEffect)(() => {
+    const input = inputRef.current;
+    if (input && document.activeElement === input) {
+      input.setSelectionRange(
+        cursorPositionRef.current,
+        cursorPositionRef.current
+      );
+    }
+  });
+  (0, import_react2.useEffect)(() => {
     onValueChange == null ? void 0 : onValueChange(isValid ? normalized : void 0);
-  }, [raw, isValid]);
-  return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: `${wrapperClass} ${className}`, children: [
-    label && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", { className: labelClass, children: label }),
+  }, [raw, isValid, normalized, onValueChange]);
+  return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: containerClass, children: [
+    showLabel && label && (renderLabel ? renderLabel(label) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", { className: labelClass, children: label })),
     /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
       "div",
       {
-        className: `${inputBoxClass} ${!isValid && raw ? "bdp-error-border" : ""}`,
+        className: wrapperClass,
+        style: {
+          borderColor: !isValid && raw.length >= 3 ? "#ef4444" : void 0
+        },
         children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "bdp-flag", children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 30 20", children: [
+          renderFlag ? renderFlag() : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: flagClass, children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 30 20", children: [
             /* @__PURE__ */ (0, import_jsx_runtime.jsx)("rect", { width: "30", height: "20", fill: "#006a4e" }),
             /* @__PURE__ */ (0, import_jsx_runtime.jsx)("circle", { cx: "12.5", cy: "10", r: "5", fill: "#f42a41" })
           ] }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "bdp-prefix", children: "+880" }),
+          renderPrefix ? renderPrefix() : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: prefixClass, children: "+880" }),
           /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
             "input",
             {
               ref: inputRef,
               className: inputClass,
-              placeholder: "enter phone number",
+              placeholder: "1XX XXXX XXXX",
               value: formatBDPhoneUI(raw),
               onChange: handleChange
             }
@@ -252,7 +231,7 @@ function BDPhoneInput({
         ]
       }
     ),
-    showError && raw.length >= 3 && error && (customError ? customError(error) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "bdp-error-text", children: error }))
+    showError && raw.length >= 3 && error && (renderError ? renderError(error) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: errorClass, children: error }))
   ] });
 }
 // Annotate the CommonJS export names for ESM import in node:
