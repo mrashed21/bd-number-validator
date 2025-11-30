@@ -64,28 +64,67 @@ styleInject(".bdp-wrapper {\n  display: flex;\n  flex-direction: column;\n  gap:
 // src/react/BDPhoneInput.tsx
 var import_react2 = __toESM(require("react"), 1);
 
+// src/react/formatBDPhoneUI.ts
+function formatBDPhoneUI(raw) {
+  if (!raw)
+    return "";
+  const digits = raw.replace(/\D/g, "");
+  if (digits.startsWith("880")) {
+    if (digits.length <= 3)
+      return digits;
+    if (digits.length <= 4)
+      return `${digits.slice(0, 3)} ${digits.slice(3)}`;
+    if (digits.length <= 7)
+      return `${digits.slice(0, 3)} ${digits.slice(3)}`;
+    if (digits.length <= 8)
+      return `${digits.slice(0, 3)} ${digits.slice(3, 7)} ${digits.slice(7)}`;
+    return `${digits.slice(0, 3)} ${digits.slice(3, 7)} ${digits.slice(7)}`;
+  }
+  if (digits.startsWith("01")) {
+    if (digits.length <= 3)
+      return digits;
+    if (digits.length <= 7)
+      return `${digits.slice(0, 3)} ${digits.slice(3)}`;
+    return `${digits.slice(0, 3)} ${digits.slice(3, 7)} ${digits.slice(7)}`;
+  }
+  if (digits.startsWith("1")) {
+    if (digits.length <= 2)
+      return digits;
+    if (digits.length <= 6)
+      return `${digits.slice(0, 2)} ${digits.slice(2)}`;
+    return `${digits.slice(0, 2)} ${digits.slice(2, 6)} ${digits.slice(6)}`;
+  }
+  if (digits.length <= 3)
+    return digits;
+  if (digits.length <= 7)
+    return `${digits.slice(0, 3)} ${digits.slice(3)}`;
+  return `${digits.slice(0, 3)} ${digits.slice(3, 7)} ${digits.slice(7)}`;
+}
+
 // src/react/useBDPhone.ts
 var import_react = require("react");
 
 // src/validate.ts
 function validatePhoneNumber(input) {
+  console.log(input);
   if (!input || input.trim() === "") {
-    return { isValid: true };
+    return { isValid: false };
   }
-  let raw = input.replace(/[^0-9]/g, "");
-  if (raw.length < 10) {
-    return { isValid: true };
-  }
-  if (raw.length === 10 && raw.startsWith("1")) {
-    raw = "0" + raw;
-  }
-  if (raw.startsWith("880") && raw.length === 13) {
-    raw = "0" + raw.slice(3);
-  }
-  if (!(raw.length === 11 && raw.startsWith("01"))) {
+  let value = input.replace(/[^0-9]/g, "");
+  let raw = "";
+  if (value.startsWith("8801")) {
+    raw = value.slice(2);
+  } else if (value.startsWith("880")) {
+    raw = value.slice(2);
+  } else if (value.startsWith("80")) {
+    raw = value.slice(1);
+  } else if (value.startsWith("0")) {
+    raw = value;
+  } else if (value.startsWith("1")) {
+    raw = "0" + value;
+  } else {
     return { isValid: false, error: "Invalid number format" };
   }
-  const prefix = raw.slice(0, 3);
   const operators = {
     Grameenphone: ["017", "013"],
     Banglalink: ["019", "014"],
@@ -95,18 +134,39 @@ function validatePhoneNumber(input) {
     Unknown: []
   };
   let operator = "Unknown";
-  for (const [op, arr] of Object.entries(operators)) {
-    if (arr.includes(prefix))
-      operator = op;
+  if (raw.length >= 3) {
+    const prefix = raw.slice(0, 3);
+    for (const [name, prefixList] of Object.entries(operators)) {
+      if (prefixList.includes(prefix)) {
+        operator = name;
+        break;
+      }
+    }
+    if (operator === "Unknown") {
+      return { isValid: false, error: "Invalid operator" };
+    }
   }
-  if (operator === "Unknown") {
-    return { isValid: false, error: "Invalid operator prefix" };
+  if (raw.length < 3) {
+    return { isValid: true };
   }
-  return {
-    isValid: true,
-    normalized: "+880" + raw.slice(1),
-    operator
-  };
+  if (raw.length === 3) {
+    return { isValid: true, operator };
+  }
+  if (raw.length > 3 && raw.length < 11) {
+    return { isValid: false, error: "Invalid number" };
+  }
+  if (raw.length > 11) {
+    return { isValid: false, error: "Invalid number" };
+  }
+  if (raw.length === 11) {
+    return {
+      isValid: true,
+      operator,
+      normalized: "+880" + raw.slice(1)
+      // Remove leading 0, add +880
+    };
+  }
+  return { isValid: false, error: "Invalid number" };
 }
 
 // src/react/useBDPhone.ts
@@ -142,11 +202,32 @@ function BDPhoneInput({
   labelClass = "bdp-label"
 }) {
   const { raw, onChange, error, isValid, normalized } = useBDPhone(value != null ? value : "");
+  console.log("error: ", error);
+  console.log("raw: ", raw);
+  console.log("onChange: ", onChange);
+  console.log("isValid: ", isValid);
+  console.log("normalized: ", normalized);
+  const inputRef = import_react2.default.useRef(null);
+  const handleChange = (e) => {
+    var _a;
+    const cursor = (_a = e.target.selectionStart) != null ? _a : 0;
+    const before = formatBDPhoneUI(raw);
+    const newDigits = e.target.value.replace(/\D/g, "");
+    onChange(newDigits);
+    const after = formatBDPhoneUI(newDigits);
+    requestAnimationFrame(() => {
+      const input = inputRef.current;
+      if (!input)
+        return;
+      const diff = after.length - before.length;
+      input.selectionStart = input.selectionEnd = cursor + diff;
+    });
+  };
   import_react2.default.useEffect(() => {
     onValueChange == null ? void 0 : onValueChange(isValid ? normalized : void 0);
   }, [raw, isValid]);
   return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: `${wrapperClass} ${className}`, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", { className: labelClass, children: label }),
+    label && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", { className: labelClass, children: label }),
     /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
       "div",
       {
@@ -160,16 +241,17 @@ function BDPhoneInput({
           /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
             "input",
             {
+              ref: inputRef,
               className: inputClass,
               placeholder: "enter phone number",
-              value: raw,
-              onChange: (e) => onChange(e.target.value)
+              value: formatBDPhoneUI(raw),
+              onChange: handleChange
             }
           )
         ]
       }
     ),
-    showError && error && (customError ? customError(error) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "bdp-error-text", children: error }))
+    showError && raw.length >= 3 && error && (customError ? customError(error) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "bdp-error-text", children: error }))
   ] });
 }
 // Annotate the CommonJS export names for ESM import in node:
