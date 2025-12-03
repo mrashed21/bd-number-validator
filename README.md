@@ -595,7 +595,7 @@ Pull requests, issues, and feedback are welcome!
 
 ## 📧 Support
 
-For support and inquiries, contact: **rashedjaman@gmail.com**
+For support and inquiries, contact: **rashedjaman768@gmail.com**
 
 ---
 
