@@ -97,6 +97,7 @@ validatePhoneNumber(" 017 8113-1905 ");
 ## ⚛️ 2. React Hook Usage (`useBDPhone`)
 
 ```javascript
+import "bd-number-validator/react/style.css";
 import { useBDPhone } from "bd-number-validator";
 
 export default function App() {
@@ -131,6 +132,7 @@ export default function App() {
 ### Basic Example
 
 ```javascript
+import "bd-number-validator/react/style.css";
 import { BDPhoneInput } from "bd-number-validator";
 
 export default function Demo() {
@@ -377,6 +379,7 @@ The input automatically formats digits as you type:
 ### ✅ Method A: With Controller (Recommended)
 
 ```javascript
+import "bd-number-validator/react/style.css";
 import { Controller, useForm } from "react-hook-form";
 import { BDPhoneInput, validatePhoneNumber } from "bd-number-validator";
 
@@ -417,6 +420,7 @@ export default function Form() {
 ### ✅ Method B: Without Controller (Simplest)
 
 ```javascript
+import "bd-number-validator/react/style.css";
 import { useForm } from "react-hook-form";
 import { BDPhoneInput, validatePhoneNumber } from "bd-number-validator";
 
@@ -513,6 +517,7 @@ export default function Form() {
 ### Controlled Component with External State
 
 ```javascript
+import "bd-number-validator/react/style.css";
 import { useState } from "react";
 import { BDPhoneInput } from "bd-number-validator";
 
@@ -561,6 +566,7 @@ export default function App() {
 All components and functions are fully typed:
 
 ```typescript
+import "bd-number-validator/react/style.css";
 import {
   BDPhoneInput,
   useBDPhone,

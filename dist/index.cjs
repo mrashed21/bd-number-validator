@@ -31,13 +31,10 @@ var import_react2 = require("react");
 
 // src/react/formatBDPhoneUI.ts
 function formatBDPhoneUI(raw) {
-  if (!raw)
-    return "";
+  if (!raw) return "";
   const digits = raw.replace(/\D/g, "");
-  if (digits.length <= 3)
-    return digits;
-  if (digits.length <= 7)
-    return `${digits.slice(0, 3)} ${digits.slice(3)}`;
+  if (digits.length <= 3) return digits;
+  if (digits.length <= 7) return `${digits.slice(0, 3)} ${digits.slice(3)}`;
   return `${digits.slice(0, 3)} ${digits.slice(3, 7)} ${digits.slice(7, 13)}`;
 }
 
@@ -155,23 +152,16 @@ function BDPhoneInput({
     const newValue = e.target.value;
     const newDigits = newValue.replace(/\D/g, "");
     let maxLength;
-    if (newDigits.startsWith("8801"))
-      maxLength = 15;
-    else if (newDigits.startsWith("880"))
-      maxLength = 15;
-    else if (newDigits.startsWith("801"))
-      maxLength = 15;
-    else if (newDigits.startsWith("80"))
-      maxLength = 15;
-    else if (newDigits.startsWith("0"))
-      maxLength = 11;
-    else
-      maxLength = 10;
+    if (newDigits.startsWith("8801")) maxLength = 15;
+    else if (newDigits.startsWith("880")) maxLength = 15;
+    else if (newDigits.startsWith("801")) maxLength = 15;
+    else if (newDigits.startsWith("80")) maxLength = 15;
+    else if (newDigits.startsWith("0")) maxLength = 11;
+    else maxLength = 10;
     const limitedDigits = newDigits.slice(0, maxLength);
     let digitsBeforeCursor = 0;
     for (let i = 0; i < cursorPos && i < newValue.length; i++) {
-      if (/\d/.test(newValue[i]))
-        digitsBeforeCursor++;
+      if (/\d/.test(newValue[i])) digitsBeforeCursor++;
     }
     onChange(limitedDigits);
     const newFormatted = formatBDPhoneUI(limitedDigits);

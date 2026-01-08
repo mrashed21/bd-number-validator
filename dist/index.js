@@ -2,7 +2,7 @@ import {
   BDPhoneInput,
   useBDPhone,
   validatePhoneNumber
-} from "./chunk-N7GKHXTX.js";
+} from "./chunk-VULHLK32.js";
 export {
   BDPhoneInput,
   useBDPhone,

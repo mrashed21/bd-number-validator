@@ -1,6 +1,6 @@
 {
   "name": "bd-number-validator",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Bangladesh phone validator with Operator detection. React component and hook for BD phone input with validation and formatting.",
   "author": "Muhammad Rashed",
   "main": "dist/index.cjs",
@@ -34,7 +34,8 @@
     "./react": {
       "import": "./dist/react.js",
       "require": "./dist/react.cjs"
-    }
+    },
+    "./react/style.css": "./dist/react.css"
   },
   "files": [
     "dist"
@@ -54,7 +55,7 @@
     "cpy-cli": "^6.0.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.17",
-    "tsup": "^6.7.0",
+    "tsup": "^8.5.1",
     "typescript": "^5.3.0"
   }
 }

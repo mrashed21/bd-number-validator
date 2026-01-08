@@ -25,44 +25,15 @@ __export(react_exports, {
 });
 module.exports = __toCommonJS(react_exports);
 
-// #style-inject:#style-inject
-function styleInject(css, { insertAt } = {}) {
-  if (!css || typeof document === "undefined")
-    return;
-  const head = document.head || document.getElementsByTagName("head")[0];
-  const style = document.createElement("style");
-  style.type = "text/css";
-  if (insertAt === "top") {
-    if (head.firstChild) {
-      head.insertBefore(style, head.firstChild);
-    } else {
-      head.appendChild(style);
-    }
-  } else {
-    head.appendChild(style);
-  }
-  if (style.styleSheet) {
-    style.styleSheet.cssText = css;
-  } else {
-    style.appendChild(document.createTextNode(css));
-  }
-}
-
-// src/react/bd-phone.css
-styleInject(".bdp-wrapper {\n  display: flex;\n  flex-direction: column;\n  gap: 4px;\n  width: 100%;\n}\n.bdp-label {\n  font-size: 14px;\n  font-weight: 500;\n  color: #374151;\n}\n.bdp-input-box {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  background: #ffffff;\n  border: 1px solid #d1d5db;\n  padding: 12px;\n  border-radius: 8px;\n  transition: 0.2s border ease;\n}\n.bdp-error-border {\n  border-color: #ef4444 !important;\n}\n.bdp-flag {\n  width: 30px;\n  height: 25px;\n  border-radius: 3px;\n}\n.bdp-prefix {\n  font-weight: 700;\n  color: #1f2937;\n}\n.bdp-input {\n  flex: 1;\n  border: none;\n  outline: none;\n  background: transparent;\n  font-size: 16px;\n  color: #111827;\n}\n.bdp-error-text {\n  font-size: 14px;\n  color: #dc2626;\n}\n");
-
 // src/react/BDPhoneInput.tsx
 var import_react2 = require("react");
 
 // src/react/formatBDPhoneUI.ts
 function formatBDPhoneUI(raw) {
-  if (!raw)
-    return "";
+  if (!raw) return "";
   const digits = raw.replace(/\D/g, "");
-  if (digits.length <= 3)
-    return digits;
-  if (digits.length <= 7)
-    return `${digits.slice(0, 3)} ${digits.slice(3)}`;
+  if (digits.length <= 3) return digits;
+  if (digits.length <= 7) return `${digits.slice(0, 3)} ${digits.slice(3)}`;
   return `${digits.slice(0, 3)} ${digits.slice(3, 7)} ${digits.slice(7, 13)}`;
 }
 
@@ -180,23 +151,16 @@ function BDPhoneInput({
     const newValue = e.target.value;
     const newDigits = newValue.replace(/\D/g, "");
     let maxLength;
-    if (newDigits.startsWith("8801"))
-      maxLength = 15;
-    else if (newDigits.startsWith("880"))
-      maxLength = 15;
-    else if (newDigits.startsWith("801"))
-      maxLength = 15;
-    else if (newDigits.startsWith("80"))
-      maxLength = 15;
-    else if (newDigits.startsWith("0"))
-      maxLength = 11;
-    else
-      maxLength = 10;
+    if (newDigits.startsWith("8801")) maxLength = 15;
+    else if (newDigits.startsWith("880")) maxLength = 15;
+    else if (newDigits.startsWith("801")) maxLength = 15;
+    else if (newDigits.startsWith("80")) maxLength = 15;
+    else if (newDigits.startsWith("0")) maxLength = 11;
+    else maxLength = 10;
     const limitedDigits = newDigits.slice(0, maxLength);
     let digitsBeforeCursor = 0;
     for (let i = 0; i < cursorPos && i < newValue.length; i++) {
-      if (/\d/.test(newValue[i]))
-        digitsBeforeCursor++;
+      if (/\d/.test(newValue[i])) digitsBeforeCursor++;
     }
     onChange(limitedDigits);
     const newFormatted = formatBDPhoneUI(limitedDigits);
