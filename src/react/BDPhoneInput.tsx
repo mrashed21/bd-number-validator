@@ -31,15 +31,15 @@ export function BDPhoneInput({
 
   label = "Phone Number",
   showLabel = true,
-  labelClass = "",
+  labelClass = "bdp-label",
   renderLabel,
 
-  containerClass = "",
-  wrapperClass = "",
-  flagClass = "",
-  prefixClass = "",
-  inputClass = "",
-  errorClass = "",
+  containerClass = "bdp-wrapper",
+  wrapperClass = "bdp-input-box",
+  flagClass = "bdp-flag",
+  prefixClass = "bdp-prefix",
+  inputClass = "bdp-input",
+  errorClass = "bdp-error-text",
 
   renderFlag,
   renderPrefix,
