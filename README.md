@@ -8,7 +8,7 @@ A lightweight, production-ready validator for Bangladesh mobile numbers with nor
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 **Author:** Muhammad Rashed  
-**Version:** 1.0.8
+**Version:** 1.0.11
 
 ---
 
@@ -596,6 +596,28 @@ MIT © Muhammad Rashed
 Pull requests, issues, and feedback are welcome!
 
 **GitHub Repository:** [https://github.com/mrashed21/bd-number-validator](https://github.com/mrashed21/bd-number-validator)
+
+### Development
+
+```bash
+# Clone the repository
+git clone https://github.com/mrashed21/bd-number-validator.git
+cd bd-number-validator
+
+# Install dependencies
+npm install
+
+# Build the package
+npm run build
+```
+
+### Submitting Changes
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/my-feature`)
+3. Commit your changes (`git commit -m 'Add my feature'`)
+4. Push to the branch (`git push origin feature/my-feature`)
+5. Open a Pull Request
 
 ---
 

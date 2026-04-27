@@ -2,7 +2,19 @@
   "name": "bd-number-validator",
   "version": "1.0.11",
   "description": "Bangladesh phone validator with Operator detection. React component and hook for BD phone input with validation and formatting.",
-  "author": "Muhammad Rashed",
+  "author": "Muhammad Rashed <rashedjaman768@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mrashed21/bd-number-validator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mrashed21/bd-number-validator/issues"
+  },
+  "homepage": "https://github.com/mrashed21/bd-number-validator#readme",
+  "engines": {
+    "node": ">=16"
+  },
   "main": "dist/index.cjs",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
