@@ -1,6 +1,6 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
-import { useRef, useState } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { useRef, useState } from "react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { PhoneInputBd } from "./phone-input-bd";
 import type { PhoneChangeDetails } from "./types";
 
@@ -37,7 +37,9 @@ describe("PhoneInputBd — rendering", () => {
   it("renders the flag and the +880 prefix by default", () => {
     const { container } = render(<PhoneInputBd />);
     expect(container.querySelector("svg")).not.toBeNull();
-    expect(container.querySelector("svg title")?.textContent).toBe("Bangladesh");
+    expect(container.querySelector("svg title")?.textContent).toBe(
+      "Bangladesh",
+    );
     expect(screen.getByText("+880")).toBeDefined();
   });
 
@@ -209,7 +211,8 @@ describe("PhoneInputBd — controlled and uncontrolled", () => {
 
 describe("PhoneInputBd — onChange contract", () => {
   it("reports digits first and validation details second", () => {
-    const onChange = vi.fn<(value: string, details: PhoneChangeDetails) => void>();
+    const onChange =
+      vi.fn<(value: string, details: PhoneChangeDetails) => void>();
     render(<PhoneInputBd onChange={onChange} />);
 
     typeInto(field(), "017 8113 1905");
@@ -223,7 +226,8 @@ describe("PhoneInputBd — onChange contract", () => {
   });
 
   it("reports undefined normalized while the number is incomplete", () => {
-    const onChange = vi.fn<(value: string, details: PhoneChangeDetails) => void>();
+    const onChange =
+      vi.fn<(value: string, details: PhoneChangeDetails) => void>();
     render(<PhoneInputBd onChange={onChange} />);
 
     typeInto(field(), "01781");
@@ -238,6 +242,15 @@ describe("PhoneInputBd — errors", () => {
   it("shows the built-in message for an unknown operator", () => {
     render(<PhoneInputBd defaultValue="012" />);
     expect(screen.getByRole("alert").textContent).toBe("Invalid operator");
+  });
+
+  it("renders the error below the input wrapper", () => {
+    const { container } = render(<PhoneInputBd defaultValue="012" />);
+    const input = field();
+    const alert = screen.getByRole("alert");
+
+    expect(input.parentElement?.contains(alert)).toBe(false);
+    expect(container.firstElementChild?.lastElementChild).toBe(alert);
   });
 
   it("stays quiet while the first digits are typed", () => {
@@ -290,7 +303,7 @@ describe("PhoneInputBd — accessibility", () => {
 
   it("keeps a caller-supplied aria-describedby alongside the error id", () => {
     render(
-      <PhoneInputBd defaultValue="012" aria-describedby="hint" label="Phone" />
+      <PhoneInputBd defaultValue="012" aria-describedby="hint" label="Phone" />,
     );
     const describedBy = field().getAttribute("aria-describedby") ?? "";
     expect(describedBy.split(" ")).toContain("hint");
@@ -318,7 +331,7 @@ describe("PhoneInputBd — accessibility", () => {
         autoComplete="off"
         inputMode="tel"
         data-testid="native"
-      />
+      />,
     );
     const input = field();
     expect(input.getAttribute("name")).toBe("phone");
@@ -337,7 +350,13 @@ describe("PhoneInputBd — accessibility", () => {
       return (
         <>
           <PhoneInputBd ref={ref} />
-          <button onClick={() => { node = ref.current; }}>read</button>
+          <button
+            onClick={() => {
+              node = ref.current;
+            }}
+          >
+            read
+          </button>
         </>
       );
     }
@@ -381,7 +400,7 @@ describe("PhoneInputBd — styling", () => {
             borderColor: hasError ? "rgb(255, 0, 0)" : "rgb(0, 0, 255)",
           }),
         }}
-      />
+      />,
     );
     const wrapper = container.querySelector(".wrap") as HTMLElement;
     expect(wrapper.style.borderColor).toBe("rgb(255, 0, 0)");
@@ -408,7 +427,7 @@ describe("PhoneInputBd — styling", () => {
           input: "input",
           error: "error",
         }}
-      />
+      />,
     );
     const root = container.firstElementChild as HTMLElement;
     expect(root.className).toBe("outer container");
