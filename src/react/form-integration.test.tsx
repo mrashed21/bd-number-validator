@@ -1,8 +1,8 @@
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { afterEach, describe, expect, it } from "vitest";
 import { useState, type ReactNode } from "react";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it } from "vitest";
 import { validatePhoneNumber } from "../core/validate-phone-number";
 import { PhoneInputBd } from "./phone-input-bd";
 import { useBdPhone } from "./use-bd-phone";
@@ -10,7 +10,7 @@ import { useBdPhone } from "./use-bd-phone";
 afterEach(cleanup);
 
 const packageJson = JSON.parse(
-  readFileSync(resolve(process.cwd(), "package.json"), "utf8")
+  readFileSync(resolve(process.cwd(), "package.json"), "utf8"),
 ) as Record<string, Record<string, string> | undefined>;
 
 const field = () => screen.getByRole("textbox") as HTMLInputElement;
@@ -20,7 +20,7 @@ describe("no form library is a dependency", () => {
     "does not list react-hook-form in %s",
     (section) => {
       expect(packageJson[section]?.["react-hook-form"]).toBeUndefined();
-    }
+    },
   );
 
   it("declares no runtime dependencies at all", () => {
@@ -33,9 +33,7 @@ describe("no form library is a dependency", () => {
   });
 
   it("is not installed in this workspace either", () => {
-    expect(
-      packageJson.devDependencies?.["react-hook-form"]
-    ).toBeUndefined();
+    expect(packageJson.devDependencies?.["react-hook-form"]).toBeUndefined();
   });
 });
 
@@ -70,7 +68,7 @@ describe("form library compatibility", () => {
         {(field) => (
           <PhoneInputBd value={field.value} onChange={field.onChange} />
         )}
-      </FieldController>
+      </FieldController>,
     );
 
     fireEvent.change(field(), { target: { value: "01781131905" } });
@@ -91,7 +89,9 @@ describe("form library compatibility", () => {
   });
 
   it("surfaces an external error through the error prop", () => {
-    render(<PhoneInputBd defaultValue="01781131905" error="Already registered" />);
+    render(
+      <PhoneInputBd defaultValue="01781131905" error="Already registered" />,
+    );
     expect(screen.getByRole("alert").textContent).toBe("Already registered");
     expect(field().getAttribute("aria-invalid")).toBe("true");
   });

@@ -129,21 +129,25 @@ describe("validatePhoneNumber — strict mode", () => {
   });
 
   it("accepts empty input when allowEmpty is set", () => {
-    expect(validatePhoneNumber("", { strict: true, allowEmpty: true })).toEqual({
-      isValid: true,
-      code: "EMPTY",
-    });
+    expect(validatePhoneNumber("", { strict: true, allowEmpty: true })).toEqual(
+      {
+        isValid: true,
+        code: "EMPTY",
+      },
+    );
   });
 
   it("rejects partially typed input that non-strict mode accepts", () => {
     expect(validatePhoneNumber("017").isValid).toBe(true);
     expect(validatePhoneNumber("017", { strict: true }).isValid).toBe(false);
-    expect(validatePhoneNumber("017", { strict: true }).code).toBe("INCOMPLETE");
+    expect(validatePhoneNumber("017", { strict: true }).code).toBe(
+      "INCOMPLETE",
+    );
   });
 
   it("still accepts a complete number", () => {
     expect(validatePhoneNumber("01781131905", { strict: true }).isValid).toBe(
-      true
+      true,
     );
   });
 });

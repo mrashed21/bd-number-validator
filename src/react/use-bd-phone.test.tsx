@@ -1,14 +1,16 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
-import { useState } from "react";
 import { act, cleanup, render, screen } from "@testing-library/react";
-import { useBdPhone } from "./use-bd-phone";
+import { useState } from "react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { PhoneChangeDetails, UseBdPhoneOptions } from "./types";
+import { useBdPhone } from "./use-bd-phone";
 
 afterEach(cleanup);
 
 /** Renders the hook and exposes its latest return value. */
 function renderHook(options: UseBdPhoneOptions = {}) {
-  const result = { current: undefined as ReturnType<typeof useBdPhone> | undefined };
+  const result = {
+    current: undefined as ReturnType<typeof useBdPhone> | undefined,
+  };
 
   function Probe(props: UseBdPhoneOptions) {
     result.current = useBdPhone(props);
@@ -98,7 +100,8 @@ describe("useBdPhone — controlled", () => {
 
 describe("useBdPhone — onChange contract", () => {
   it("reports digits plus full validation details", () => {
-    const onChange = vi.fn<(value: string, details: PhoneChangeDetails) => void>();
+    const onChange =
+      vi.fn<(value: string, details: PhoneChangeDetails) => void>();
     const { result } = renderHook({ onChange });
 
     act(() => result.current.onChange("+8801781131905"));
@@ -118,9 +121,16 @@ describe("useBdPhone — onChange contract", () => {
 
     function Wrapper() {
       const [tag, setTag] = useState("first");
-      const phone = useBdPhone({ onChange: (value) => calls.push(`${tag}:${value}`) });
+      const phone = useBdPhone({
+        onChange: (value) => calls.push(`${tag}:${value}`),
+      });
       return (
-        <button onClick={() => { setTag("second"); phone.onChange("017"); }}>
+        <button
+          onClick={() => {
+            setTag("second");
+            phone.onChange("017");
+          }}
+        >
           go
         </button>
       );

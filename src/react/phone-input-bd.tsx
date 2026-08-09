@@ -12,8 +12,8 @@ import { formatBdPhoneUi } from "../core/format-bd-phone-ui";
 import { toInputDigits } from "../core/normalize-phone-number";
 import { BdFlag } from "./bd-flag";
 import { getDefaultStyles, resolveStyle } from "./default-styles";
-import { useBdPhone } from "./use-bd-phone";
 import type { PhoneInputBdProps, PhoneInputBdState } from "./types";
+import { useBdPhone } from "./use-bd-phone";
 
 /** Count digits appearing before `caret` in `text`. */
 function countDigitsBefore(text: string, caret: number): number {
@@ -37,19 +37,6 @@ function caretAfterDigit(formatted: string, count: number): number {
   return formatted.length;
 }
 
-/**
- * A ready-to-use Bangladeshi phone number field.
- *
- * Renders a flag, a `+880` prefix and an input that formats digits as
- * `017 8113 1905` while keeping the stored value digits-only. Works controlled
- * (`value` + `onChange`) or uncontrolled (`defaultValue`), needs no stylesheet
- * import, and knows nothing about any form library — pass it to React Hook
- * Form's `Controller`, Formik, or plain `useState` alike.
- *
- * @example
- * const [phone, setPhone] = useState("");
- * <PhoneInputBd label="Mobile number" value={phone} onChange={setPhone} />
- */
 export const PhoneInputBd = forwardRef<HTMLInputElement, PhoneInputBdProps>(
   function PhoneInputBd(
     {
@@ -80,7 +67,7 @@ export const PhoneInputBd = forwardRef<HTMLInputElement, PhoneInputBdProps>(
       "aria-describedby": ariaDescribedBy,
       ...inputProps
     },
-    forwardedRef
+    forwardedRef,
   ) {
     const phone = useBdPhone({ value, defaultValue, onChange });
 
@@ -95,7 +82,7 @@ export const PhoneInputBd = forwardRef<HTMLInputElement, PhoneInputBdProps>(
         if (typeof forwardedRef === "function") forwardedRef(node);
         else if (forwardedRef) forwardedRef.current = node;
       },
-      [forwardedRef]
+      [forwardedRef],
     );
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -108,17 +95,12 @@ export const PhoneInputBd = forwardRef<HTMLInputElement, PhoneInputBdProps>(
       const formatted = formatBdPhoneUi(digits);
       const nextCaret = caretAfterDigit(formatted, digitsBeforeCaret);
 
-      // Re-apply the formatted text straight away. React skips the DOM write
-      // when the value is unchanged (e.g. a rejected 12th digit), so without
-      // this the field could keep a character the component rejected.
       if (element.value !== formatted) element.value = formatted;
       pendingCaretRef.current = nextCaret;
 
       phone.onChange(digits);
     };
 
-    // Restore the caret once per edit, and only while the field has focus, so
-    // an unrelated re-render never collapses the user's selection.
     useEffect(() => {
       const element = innerRef.current;
       const caret = pendingCaretRef.current;
@@ -169,8 +151,10 @@ export const PhoneInputBd = forwardRef<HTMLInputElement, PhoneInputBdProps>(
 
     return (
       <div
-        className={[className, classNames.container].filter(Boolean).join(" ") ||
-          undefined}
+        className={
+          [className, classNames.container].filter(Boolean).join(" ") ||
+          undefined
+        }
         style={styleFor("container")}
       >
         {label !== undefined && label !== null && label !== false ? (
@@ -183,7 +167,10 @@ export const PhoneInputBd = forwardRef<HTMLInputElement, PhoneInputBdProps>(
           </label>
         ) : null}
 
-        <div className={classNames.inputWrapper} style={styleFor("inputWrapper")}>
+        <div
+          className={classNames.inputWrapper}
+          style={styleFor("inputWrapper")}
+        >
           {flag === undefined ? (
             <BdFlag
               title="Bangladesh"
@@ -195,10 +182,7 @@ export const PhoneInputBd = forwardRef<HTMLInputElement, PhoneInputBdProps>(
           )}
 
           {prefix !== null && prefix !== undefined ? (
-            <span
-              className={classNames.prefix}
-              style={styleFor("prefix")}
-            >
+            <span className={classNames.prefix} style={styleFor("prefix")}>
               {prefix}
             </span>
           ) : null}
@@ -237,5 +221,5 @@ export const PhoneInputBd = forwardRef<HTMLInputElement, PhoneInputBdProps>(
         ) : null}
       </div>
     );
-  }
+  },
 );

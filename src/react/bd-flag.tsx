@@ -1,26 +1,13 @@
 import type { SVGProps } from "react";
 
-/** Props for {@link BdFlag}. */
 export interface BdFlagProps extends Omit<SVGProps<SVGSVGElement>, "children"> {
-  /**
-   * Accessible name. When provided the flag is exposed as an image with this
-   * name; when omitted it is hidden from assistive technology, which is the
-   * right default for a decorative icon sitting next to a `+880` label.
-   */
   title?: string;
 }
 
-/**
- * Inline SVG of the flag of Bangladesh, drawn to the official proportions
- * (10:6 field, disc radius 1/5 of the length, centered at 9/20 of the length).
- *
- * No network request, no CSS file, no external asset — it scales with
- * `width`/`height` or the surrounding font size.
- */
 export function BdFlag({
   title,
-  width = 30,
-  height = 18,
+  width = 25,
+  height = 15,
   ...rest
 }: BdFlagProps) {
   return (

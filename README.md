@@ -336,24 +336,90 @@ The state object is `{ isValid, hasError, isFocused, isDisabled, isReadOnly, isC
 
 ### 3. CSS custom properties — theme without touching props
 
+Every variable, with the built-in default:
+
 ```css
 .signup-form {
-  --phone-input-bd-border: #d1d5db;
-  --phone-input-bd-border-focus: #16a34a;
-  --phone-input-bd-border-error: #ef4444;
-  --phone-input-bd-radius: 12px;
-  --phone-input-bd-bg: #ffffff;
-  --phone-input-bd-color: #111827;
-  --phone-input-bd-label-color: #374151;
-  --phone-input-bd-prefix-color: #1f2937;
-  --phone-input-bd-error-color: #dc2626;
-  --phone-input-bd-font-size: 16px;
-  --phone-input-bd-padding: 10px 12px;
-  --phone-input-bd-gap: 4px;
+  /* shape */
+  --phone-input-bd-height: 36px; /* shadcn h-9 */
+  --phone-input-bd-padding: 7px 12px; /* shadcn px-3 */
+  --phone-input-bd-radius: 8px; /* shadcn rounded-md */
+  --phone-input-bd-gap: 8px; /* label -> field -> message */
+  --phone-input-bd-inner-gap: 8px; /* flag -> prefix -> value */
+  --phone-input-bd-font-size: 14px; /* shadcn text-sm */
+  --phone-input-bd-line-height: 1.4285714;
+
+  /* colour */
+  --phone-input-bd-bg: transparent;
+  --phone-input-bd-color: #0a0a0a; /* --foreground */
+  --phone-input-bd-label-color: #0a0a0a; /* --foreground */
+  --phone-input-bd-prefix-color: #737373; /* --muted-foreground */
+  --phone-input-bd-border: #e5e5e5; /* --input */
+  --phone-input-bd-border-focus: #a1a1a1; /* --ring */
+  --phone-input-bd-border-error: #e7000b; /* --destructive */
+  --phone-input-bd-error-color: #e7000b; /* --destructive */
+  --phone-input-bd-ring: rgba(161, 161, 161, 0.5); /* ring-ring/50 */
+  --phone-input-bd-ring-error: rgba(231, 0, 11, 0.2); /* ring-destructive/20 */
+  --phone-input-bd-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); /* shadow-xs */
 }
 ```
 
 The full list is exported as `CSS_VARIABLES`.
+
+### shadcn/ui
+
+The defaults **are** shadcn's: the field is `h-9` (36px), `rounded-md`, `px-3`,
+`text-sm`, `border-input`, `shadow-xs`, with a 3px `ring-ring/50` on focus and
+`ring-destructive/20` plus a red label when the number is invalid. Dropped into
+a shadcn form next to `<Input />` it lines up on every edge with nothing to
+configure.
+
+To follow a **custom shadcn theme** — a different base colour, a different
+`--radius`, or dark mode — map the tokens once and the component tracks your
+theme everywhere, light and dark:
+
+```css
+:root {
+  --phone-input-bd-height: 2.25rem;
+  --phone-input-bd-radius: calc(var(--radius) - 2px);
+  --phone-input-bd-bg: transparent;
+  --phone-input-bd-color: var(--foreground);
+  --phone-input-bd-label-color: var(--foreground);
+  --phone-input-bd-prefix-color: var(--muted-foreground);
+  --phone-input-bd-border: var(--input);
+  --phone-input-bd-border-focus: var(--ring);
+  --phone-input-bd-border-error: var(--destructive);
+  --phone-input-bd-error-color: var(--destructive);
+  --phone-input-bd-ring: color-mix(in oklab, var(--ring) 50%, transparent);
+  --phone-input-bd-ring-error: color-mix(
+    in oklab,
+    var(--destructive) 20%,
+    transparent
+  );
+}
+
+.dark {
+  --phone-input-bd-bg: color-mix(in oklab, var(--input) 30%, transparent);
+}
+```
+
+Prefer Tailwind classes over variables? `unstyled` plus `classNames` gives you
+the shadcn `Input` string verbatim — see the `classNames` example above.
+
+**Height.** The control is `36px` because its line box is exactly `20px`
+(`14px` × `1.4285714`, Tailwind's `text-sm`) plus `7px` of padding and a `1px`
+border. The prefix and the value share that line box, so they sit on one
+baseline and the row never shifts with the host page's own `line-height`. For a
+different control height, move `--phone-input-bd-height` and
+`--phone-input-bd-padding` together:
+
+```css
+/* 40px field */
+.signup-form {
+  --phone-input-bd-height: 40px;
+  --phone-input-bd-padding: 9px 12px;
+}
+```
 
 ### Slots
 

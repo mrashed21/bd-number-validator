@@ -1,16 +1,5 @@
 import { sanitizePhoneNumber } from "./normalize-phone-number";
 
-/**
- * Group digits for display as `017 8113 1905` (3 / 4 / 4).
- *
- * Presentation only — the value you store and submit stays digits-only.
- * Safe to call on a partially typed number.
- *
- * @example
- * formatBdPhoneUi("017");         // "017"
- * formatBdPhoneUi("0178113");     // "017 8113"
- * formatBdPhoneUi("01781131905"); // "017 8113 1905"
- */
 export function formatBdPhoneUi(input: string): string {
   const digits = sanitizePhoneNumber(input);
   if (!digits) return "";

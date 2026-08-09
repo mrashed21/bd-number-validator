@@ -8,17 +8,10 @@ afterEach(cleanup);
 
 const field = () => screen.getByRole("textbox") as HTMLInputElement;
 
-/** Last recorded call of a mocked `onChange`. */
 function lastCall<T extends unknown[]>(mock: { mock: { calls: T[] } }): T {
   return mock.mock.calls[mock.mock.calls.length - 1];
 }
 
-/**
- * Simulate typing/pasting `value` with the caret left at `caret`.
- *
- * The value must go through `fireEvent` so React's value tracker sees a real
- * change; assigning `input.value` directly would suppress the change event.
- */
 function typeInto(input: HTMLInputElement, value: string, caret?: number) {
   input.focus();
   fireEvent.change(input, {
@@ -410,6 +403,39 @@ describe("PhoneInputBd — styling", () => {
     render(<PhoneInputBd unstyled />);
     expect(field().style.background).toBe("");
     expect(field().style.border).toBe("");
+  });
+
+  it("gives the prefix and the input the same line box so they align", () => {
+    const { container } = render(
+      <PhoneInputBd classNames={{ prefix: "prefix" }} />,
+    );
+    const prefix = container.querySelector(".prefix") as HTMLElement;
+
+    expect(prefix.style.fontSize).toBe(field().style.fontSize);
+    expect(prefix.style.lineHeight).toBe(field().style.lineHeight);
+  });
+
+  it("sets an explicit line-height so a host stylesheet cannot resize the row", () => {
+    const { container } = render(
+      <PhoneInputBd classNames={{ prefix: "prefix", inputWrapper: "wrap" }} />,
+    );
+    const wrapper = container.querySelector(".wrap") as HTMLElement;
+
+    expect(field().style.lineHeight).not.toBe("");
+    expect(
+      (container.querySelector(".prefix") as HTMLElement).style.lineHeight,
+    ).not.toBe("");
+    expect(wrapper.style.minHeight).toContain("--phone-input-bd-height");
+  });
+
+  it("draws the focus ring without color-mix so older browsers keep it", () => {
+    const { container } = render(
+      <PhoneInputBd classNames={{ inputWrapper: "wrap" }} defaultValue="012" />,
+    );
+    const wrapper = container.querySelector(".wrap") as HTMLElement;
+
+    expect(wrapper.style.boxShadow).toContain("rgba(239, 68, 68, 0.16)");
+    expect(wrapper.style.boxShadow).not.toContain("color-mix");
   });
 
   it("applies className to the container and classNames per slot", () => {
