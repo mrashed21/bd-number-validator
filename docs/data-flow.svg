@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 520" width="760" height="520" role="img" aria-label="Data flow: user input is sanitized to digits, canonicalized to the local form, the operator is detected, the length is checked, and a normalized plus-880 number is produced.">
+  <defs>
+    <marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+  <g font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif">
+
+    <rect x="40" y="20" width="270" height="52" rx="8" fill="#2563eb"/>
+    <text x="175" y="44" text-anchor="middle" font-size="14" font-weight="600" fill="#ffffff">User input</text>
+    <text x="175" y="62" text-anchor="middle" font-size="11" fill="#dbeafe">any accepted shape</text>
+    <rect x="360" y="29" width="360" height="34" rx="6" fill="#e2e8f0"/>
+    <text x="376" y="51" font-size="13" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" fill="#0f172a">"+880 17-8113 1905"</text>
+
+    <path d="M 175 72 L 175 100" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#arrow2)"/>
+
+    <rect x="40" y="102" width="270" height="52" rx="8" fill="#059669"/>
+    <text x="175" y="126" text-anchor="middle" font-size="14" font-weight="600" fill="#ffffff">sanitizePhoneNumber</text>
+    <text x="175" y="144" text-anchor="middle" font-size="11" fill="#d1fae5">keep digits only</text>
+    <rect x="360" y="111" width="360" height="34" rx="6" fill="#e2e8f0"/>
+    <text x="376" y="133" font-size="13" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" fill="#0f172a">"8801781131905"</text>
+
+    <path d="M 175 154 L 175 182" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#arrow2)"/>
+
+    <rect x="40" y="184" width="270" height="52" rx="8" fill="#059669"/>
+    <text x="175" y="208" text-anchor="middle" font-size="14" font-weight="600" fill="#ffffff">toLocalNumber</text>
+    <text x="175" y="226" text-anchor="middle" font-size="11" fill="#d1fae5">strip +880 / 880 / 80, add 0</text>
+    <rect x="360" y="193" width="360" height="34" rx="6" fill="#e2e8f0"/>
+    <text x="376" y="215" font-size="13" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" fill="#0f172a">"01781131905"</text>
+
+    <path d="M 175 236 L 175 264" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#arrow2)"/>
+
+    <rect x="40" y="266" width="270" height="52" rx="8" fill="#059669"/>
+    <text x="175" y="290" text-anchor="middle" font-size="14" font-weight="600" fill="#ffffff">detectOperator</text>
+    <text x="175" y="308" text-anchor="middle" font-size="11" fill="#d1fae5">first 3 digits</text>
+    <rect x="360" y="275" width="360" height="34" rx="6" fill="#e2e8f0"/>
+    <text x="376" y="297" font-size="13" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" fill="#0f172a">"Grameenphone"  ← 017</text>
+
+    <path d="M 175 318 L 175 346" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#arrow2)"/>
+
+    <rect x="40" y="348" width="270" height="52" rx="8" fill="#059669"/>
+    <text x="175" y="372" text-anchor="middle" font-size="14" font-weight="600" fill="#ffffff">length check</text>
+    <text x="175" y="390" text-anchor="middle" font-size="11" fill="#d1fae5">exactly 11 digits</text>
+    <rect x="360" y="357" width="360" height="34" rx="6" fill="#e2e8f0"/>
+    <text x="376" y="379" font-size="13" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" fill="#0f172a">11 → complete</text>
+
+    <path d="M 175 400 L 175 428" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#arrow2)"/>
+
+    <rect x="40" y="430" width="270" height="52" rx="8" fill="#7c3aed"/>
+    <text x="175" y="454" text-anchor="middle" font-size="14" font-weight="600" fill="#ffffff">normalized</text>
+    <text x="175" y="472" text-anchor="middle" font-size="11" fill="#ede9fe">the only submit-ready value</text>
+    <rect x="360" y="439" width="360" height="34" rx="6" fill="#e2e8f0"/>
+    <text x="376" y="461" font-size="13" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" fill="#0f172a">"+8801781131905"</text>
+
+    <text x="360" y="503" font-size="12" fill="#64748b">An unknown prefix stops at step 4; a wrong length stops at step 5 — both return an `error` and a `code`.</text>
+  </g>
+</svg>

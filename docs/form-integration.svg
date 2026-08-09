@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 430" width="880" height="430" role="img" aria-label="React Hook Form integration: react-hook-form and Controller live entirely in your app and are optional; they connect to PhoneInputBd through a plain value and onChange pair. The package itself never imports react-hook-form.">
+  <defs>
+    <marker id="arrow3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+  <g font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif">
+
+    <!-- optional side -->
+    <rect x="40" y="50" width="340" height="270" rx="12" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="6 5"/>
+    <text x="56" y="74" font-size="13" font-weight="600" fill="#f59e0b">YOUR APP — optional, install only if you want it</text>
+
+    <rect x="80" y="95" width="260" height="46" rx="8" fill="#f59e0b"/>
+    <text x="210" y="123" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">react-hook-form</text>
+
+    <path d="M 210 143 L 210 173" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#arrow3)"/>
+
+    <rect x="80" y="175" width="260" height="46" rx="8" fill="#f59e0b"/>
+    <text x="210" y="203" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">&lt;Controller /&gt;</text>
+
+    <text x="210" y="255" text-anchor="middle" font-size="12" fill="#64748b">Swap in Formik, a native form, or plain</text>
+    <text x="210" y="273" text-anchor="middle" font-size="12" fill="#64748b">useState — nothing on the right changes.</text>
+    <text x="210" y="299" text-anchor="middle" font-size="12" font-weight="600" fill="#64748b">the package never imports any of them</text>
+
+    <!-- package side -->
+    <rect x="500" y="50" width="340" height="270" rx="12" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 5"/>
+    <text x="516" y="74" font-size="13" font-weight="600" fill="#64748b">bd-number-validator</text>
+
+    <rect x="540" y="95" width="260" height="46" rx="8" fill="#4f46e5"/>
+    <text x="670" y="123" text-anchor="middle" font-size="14" font-weight="600" fill="#ffffff">PhoneInputBd</text>
+
+    <path d="M 670 143 L 670 173" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#arrow3)"/>
+
+    <rect x="540" y="175" width="260" height="46" rx="8" fill="#059669"/>
+    <text x="670" y="203" text-anchor="middle" font-size="14" font-weight="600" fill="#ffffff">validatePhoneNumber</text>
+
+    <text x="670" y="255" text-anchor="middle" font-size="12" fill="#64748b">Zero runtime dependencies.</text>
+    <text x="670" y="273" text-anchor="middle" font-size="12" fill="#64748b">react is the only peer, and it is optional.</text>
+
+    <!-- bridge -->
+    <path d="M 382 108 L 536 108" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#arrow3)"/>
+    <text x="459" y="100" text-anchor="middle" font-size="12" font-weight="600" fill="#64748b">value · onChange</text>
+
+    <path d="M 536 136 L 382 136" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#arrow3)"/>
+    <text x="459" y="156" text-anchor="middle" font-size="12" font-weight="600" fill="#64748b">digits + details</text>
+
+    <!-- banner -->
+    <rect x="40" y="358" width="800" height="46" rx="8" fill="#e2e8f0"/>
+    <text x="440" y="386" text-anchor="middle" font-size="13" font-weight="600" fill="#0f172a">npm install bd-number-validator — that is the whole install. react-hook-form is never required.</text>
+  </g>
+</svg>

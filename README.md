@@ -1,632 +1,796 @@
-# 📱 bd-number-validator
+# bd-number-validator
 
-**Bangladesh Phone Number Validator + React Input Component**
-
-A lightweight, production-ready validator for Bangladesh mobile numbers with normalization, operator detection, React components, hook support, and full React Hook Form integration.
+**Bangladesh mobile number validation, normalization and operator detection — plus an optional React input that needs no CSS file and no form library.**
 
 [![npm version](https://img.shields.io/npm/v/bd-number-validator.svg)](https://www.npmjs.com/package/bd-number-validator)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
-**Author:** Muhammad Rashed  
-**Version:** 1.0.11
-
----
-
-## ⭐ Features
-
-- ✅ **Multiple Format Support** - Accepts `+8801781131905`, `8801781131905`, `01781131905`, `1781131905`
-- ✅ **Auto Normalization** - Returns standardized `+8801781131905` format
-- ✅ **Operator Detection** - Identifies Grameenphone, Banglalink, Robi, Airtel, Teletalk
-- ✅ **Live Validation** - Real-time validation that starts after sufficient digits
-- ✅ **Smart Error Handling** - No errors on empty input
-- ✅ **Smart Cursor Positioning** - Maintains cursor position during formatting
-- ✅ **Auto-formatting UI** - Displays as `1XX XXXX XXXX` while typing
-- ✅ **Bangladesh Flag Icon** - Built-in SVG flag component
-- ✅ **React Hook + Component** - Ready-to-use hooks and components
-- ✅ **Tailwind-Friendly** - Fully customizable with Tailwind classes
-- ✅ **React Hook Form Integration** - Seamless integration with form libraries
-- ✅ **TypeScript Support** - Full type safety
-- ✅ **Zero Config CSS** - Styles load automatically
-
----
-
-## 📦 Installation
+[![Types](https://img.shields.io/badge/types-included-blue.svg)](#typescript)
 
 ```bash
-npm i bd-number-validator
+npm install bd-number-validator
 ```
 
-Or using Yarn:
-
-```bash
-yarn add bd-number-validator
-```
+That is the entire install. No `react-hook-form`, no Tailwind, no PostCSS, no
+stylesheet import, **no runtime dependencies at all**.
 
 ---
 
-## 🧠 1. Core Validator Usage
+## Why
 
-### Basic Validation
+Bangladeshi users type their number in at least five shapes — `01781131905`,
+`1781131905`, `8801781131905`, `+8801781131905`, `017-8113 1905`. Your database
+wants exactly one: `+8801781131905`.
 
-```javascript
+This package closes that gap with one pure function, and — if you use React —
+one drop-in input built on top of it.
+
+- **Framework-free core.** `validatePhoneNumber` runs in Node, the browser, edge
+  runtimes and workers. It never imports React.
+- **Optional React layer.** `PhoneInputBd` + `useBdPhone`, in a separate entry.
+- **No CSS import.** Styles ship inline; every slot is overridable.
+- **No form library coupling.** It is a plain controlled input — React Hook
+  Form, Formik, a native `<form>` or `useState` all work identically.
+- **Accessible by default.** Label association, `aria-invalid`,
+  `aria-describedby`, `role="alert"`, `inputMode`, `autoComplete`.
+- **TypeScript-first.** Every public type is exported.
+
+---
+
+## Table of contents
+
+- [Quick start](#quick-start) · [Architecture](#architecture) · [How validation works](#how-validation-works)
+- [Core API](#core-api) · [React API](#react-api) · [Styling](#styling)
+- [Form libraries](#form-libraries) · [Custom UI](#custom-ui) · [Server-side](#server-side-usage)
+- [Accessibility](#accessibility) · [TypeScript](#typescript) · [API reference](#api-reference)
+- [Supported formats](#supported-input-formats) · [Limitations](#limitations) · [Migrating from v1](#migrating-from-v1)
+
+---
+
+## Quick start
+
+### Validate anywhere
+
+```ts
 import { validatePhoneNumber } from "bd-number-validator";
 
-const result = validatePhoneNumber("01781131905");
+const result = validatePhoneNumber("+880 17-8113 1905");
 
-console.log(result);
-/*
-{
-  isValid: true,
-  normalized: "+8801781131905",
-  operator: "Grameenphone"
-}
-*/
+result.normalized; // "+8801781131905"
+result.local;      // "01781131905"
+result.operator;   // "Grameenphone"
+result.isValid;    // true
 ```
 
-### Pre-Submit Validation
+### React input
 
-```javascript
-const result = validatePhoneNumber(phone);
+```tsx
+import { useState } from "react";
+import { PhoneInputBd } from "bd-number-validator/react";
 
-if (!result.isValid) {
-  console.error(result.error);
-  return;
-}
-
-// Submit using normalized number
-api.post("/signup", { phone: result.normalized });
-```
-
-### Auto-Clean During Typing
-
-```javascript
-validatePhoneNumber(" 017 8113-1905 ");
-// Automatically removes spaces and special characters
-```
-
-### Shorthand Format Support
-
-| Input            | Auto-Fixed Output |
-| ---------------- | ----------------- |
-| `1781131905`     | `01781131905`     |
-| `8801781131905`  | `01781131905`     |
-| `+8801781131905` | normalized format |
-
----
-
-## ⚛️ 2. React Hook Usage (`useBDPhone`)
-
-```javascript
-import "bd-number-validator/react/style.css";
-import { useBDPhone } from "bd-number-validator";
-
-export default function App() {
-  const { raw, onChange, error, normalized, operator, isValid } =
-    useBDPhone("");
+export default function SignUp() {
+  const [phone, setPhone] = useState("");
 
   return (
-    <div>
-      <input
-        value={raw}
-        placeholder="Enter phone number"
-        onChange={(e) => onChange(e.target.value)}
-      />
-
-      {error && <p style={{ color: "red" }}>{error}</p>}
-
-      {isValid && normalized && (
-        <>
-          <p>Normalized: {normalized}</p>
-          <p>Operator: {operator}</p>
-        </>
-      )}
-    </div>
+    <PhoneInputBd
+      label="Mobile number"
+      value={phone}
+      onChange={setPhone}
+    />
   );
 }
 ```
 
+No `import "…/style.css"`. The component renders a Bangladesh flag, a `+880`
+prefix and a field that displays `017 8113 1905` while keeping `phone` as
+digits-only `01781131905`.
+
 ---
 
-## 🎨 3. React Component — `<BDPhoneInput />`
+## Architecture
 
-### Basic Example
+![Architecture: a React app uses PhoneInputBd and useBdPhone from the react entry, which call the framework-free core. A server calls the core directly, without React.](docs/architecture.svg)
 
-```javascript
-import "bd-number-validator/react/style.css";
-import { BDPhoneInput } from "bd-number-validator";
+Two entry points, one direction of dependency:
 
-export default function Demo() {
-  return <BDPhoneInput onValueChange={(val) => console.log(val)} />;
-}
+| Import | Contains | Needs React |
+| --- | --- | --- |
+| `bd-number-validator` | validation, normalization, formatting, operators | no |
+| `bd-number-validator/validate` | alias of the above, for server code that wants the intent to be obvious | no |
+| `bd-number-validator/react` | `PhoneInputBd`, `BdFlag`, `useBdPhone` **+ everything from the core** | yes |
+
+The core never imports React, so a backend bundle stays React-free. In a React
+app you only ever need the `/react` import — it re-exports the core too.
+
+---
+
+## How validation works
+
+![Data flow: user input is sanitized to digits, canonicalized to the local form, the operator is detected, the length is checked, and a normalized +880 number is produced.](docs/data-flow.svg)
+
+### The one rule worth knowing
+
+`isValid` is **progressive**. While the user is still typing, an empty or
+half-finished number is reported as `isValid: true` so your form does not flash
+red on the first keystroke.
+
+> **`normalized` — not `isValid` — is the proof of a complete number.**
+
+```ts
+// ❌ accepts an empty field
+if (validatePhoneNumber(phone).isValid) submit();
+
+// ✅ submit-ready
+const result = validatePhoneNumber(phone);
+if (result.normalized) submit(result.normalized);
+
+// ✅ or ask for strict mode, which rejects empty and partial input
+const strict = validatePhoneNumber(phone, { strict: true });
+if (!strict.isValid) showError(strict.error);
 ```
 
-### Features
+Shortcut for the common case:
 
-- **Bangladesh Flag**: Built-in SVG flag icon
-- **Auto-formatting**: Displays as `1XX XXXX XXXX` format
-- **Smart Cursor**: Maintains cursor position during typing
-- **Validation**: Shows errors after 3+ digits entered
-- **Customizable**: All parts can be styled or replaced
+```ts
+import { isValidPhoneNumber } from "bd-number-validator";
 
-### With Label
-
-```javascript
-<BDPhoneInput
-  label="Phone Number"
-  showLabel={true}
-  onValueChange={(val) => console.log(val)}
-/>
-```
-
-### Custom Error UI
-
-```javascript
-<BDPhoneInput
-  renderError={(msg) => <div className="text-red-600 font-bold">⚠ {msg}</div>}
-/>
-```
-
-### Custom Flag
-
-```javascript
-<BDPhoneInput
-  renderFlag={() => <img src="/bd-flag.png" alt="BD" className="w-6 h-4" />}
-/>
-```
-
-### Full Tailwind Customization
-
-```javascript
-<BDPhoneInput
-  label="Mobile Number"
-  showLabel={true}
-  containerClass="mb-4"
-  labelClass="block text-sm font-medium text-gray-700 mb-2"
-  wrapperClass="flex items-center gap-2 border border-gray-300 rounded-lg px-3 py-2 focus-within:ring-2 focus-within:ring-blue-500"
-  flagClass="w-6 h-4"
-  prefixClass="text-gray-600 font-medium"
-  inputClass="flex-1 outline-none text-gray-900"
-  errorClass="text-sm text-red-600 mt-1"
-  showError={true}
-  onValueChange={(v) => console.log(v)}
-/>
-```
-
-### Custom Label Renderer
-
-```javascript
-<BDPhoneInput
-  label="Phone Number"
-  renderLabel={(label) => (
-    <div className="flex items-center gap-2 mb-2">
-      <span className="font-semibold">{label}</span>
-      <span className="text-xs text-gray-500">(Required)</span>
-    </div>
-  )}
-/>
-```
-
-### Custom Prefix
-
-```javascript
-<BDPhoneInput
-  renderPrefix={() => <span className="text-blue-600 font-bold">+880</span>}
-/>
+isValidPhoneNumber("01781131905"); // true
+isValidPhoneNumber("017");         // false
+isValidPhoneNumber("");            // false
 ```
 
 ---
 
-## 📚 4. API Reference
+## Core API
 
-### `validatePhoneNumber(phone: string)`
+### `validatePhoneNumber(input, options?)`
 
-**Returns:**
+```ts
+validatePhoneNumber("01781131905");
+// {
+//   isValid: true,
+//   normalized: "+8801781131905",
+//   local: "01781131905",
+//   operator: "Grameenphone"
+// }
 
-| Field        | Type                    | Description                    |
-| ------------ | ----------------------- | ------------------------------ |
-| `isValid`    | `boolean`               | Phone number validity          |
-| `error`      | `string \| undefined`   | Error message if invalid       |
-| `normalized` | `string \| undefined`   | `+8801XXXXXXXXX` format        |
-| `operator`   | `Operator \| undefined` | GP, BL, Robi, Airtel, Teletalk |
+validatePhoneNumber("01211111111");
+// { isValid: false, operator: "Unknown", code: "INVALID_OPERATOR", error: "Invalid operator" }
 
----
+validatePhoneNumber("0178113");
+// { isValid: false, operator: "Grameenphone", code: "INCOMPLETE", error: "Invalid number" }
 
-### `useBDPhone(initialValue: string)`
-
-**Returns:**
-
-| Field        | Type                      | Description               |
-| ------------ | ------------------------- | ------------------------- |
-| `raw`        | `string`                  | Current input value       |
-| `error`      | `string \| undefined`     | Validation error          |
-| `normalized` | `string \| undefined`     | Normalized BD format      |
-| `operator`   | `Operator \| undefined`   | Operator name             |
-| `isValid`    | `boolean`                 | `true` if number is valid |
-| `onChange`   | `(value: string) => void` | Pass to input onChange    |
-
----
-
-### `<BDPhoneInput />` Props
-
-#### Value & Change Handling
-
-| Prop            | Type                   | Default | Description               |
-| --------------- | ---------------------- | ------- | ------------------------- |
-| `value`         | `string`               | —       | Controlled value          |
-| `onValueChange` | `(v?: string) => void` | —       | Returns normalized number |
-
-#### Label Props
-
-| Prop          | Type                           | Default          | Description           |
-| ------------- | ------------------------------ | ---------------- | --------------------- |
-| `label`       | `string`                       | `"Phone Number"` | Input label text      |
-| `showLabel`   | `boolean`                      | `true`           | Show/hide label       |
-| `labelClass`  | `string`                       | `""`             | Label CSS class       |
-| `renderLabel` | `(label: string) => ReactNode` | —                | Custom label renderer |
-
-#### Styling Props
-
-| Prop             | Type     | Default | Description           |
-| ---------------- | -------- | ------- | --------------------- |
-| `containerClass` | `string` | `""`    | Outer container class |
-| `wrapperClass`   | `string` | `""`    | Input wrapper class   |
-| `flagClass`      | `string` | `""`    | Flag icon class       |
-| `prefixClass`    | `string` | `""`    | +880 prefix class     |
-| `inputClass`     | `string` | `""`    | Input field class     |
-| `errorClass`     | `string` | `""`    | Error message class   |
-
-#### Custom Renderers
-
-| Prop           | Type                           | Default | Description               |
-| -------------- | ------------------------------ | ------- | ------------------------- |
-| `renderFlag`   | `() => ReactNode`              | —       | Custom flag component     |
-| `renderPrefix` | `() => ReactNode`              | —       | Custom prefix (e.g. +880) |
-| `renderError`  | `(error: string) => ReactNode` | —       | Custom error renderer     |
-
-#### Error Display
-
-| Prop        | Type      | Default | Description             |
-| ----------- | --------- | ------- | ----------------------- |
-| `showError` | `boolean` | `true`  | Toggle error visibility |
-
----
-
-## 📡 5. Operator Detection Table
-
-| Operator     | Prefix   |
-| ------------ | -------- |
-| Grameenphone | 017, 013 |
-| Banglalink   | 019, 014 |
-| Robi         | 018      |
-| Airtel       | 016      |
-| Teletalk     | 015      |
-
----
-
-## 🧪 6. Example Outputs
-
-### ✅ Valid Example
-
-```json
-{
-  "isValid": true,
-  "normalized": "+8801781131905",
-  "operator": "Grameenphone"
-}
+validatePhoneNumber("", { strict: true });
+// { isValid: false, code: "EMPTY", error: "Phone number is required" }
 ```
 
-### ✅ Empty Input (Valid)
+**Options**
 
-```json
-{
-  "isValid": true
-}
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `strict` | `boolean` | `false` | Reject empty and partially typed input. Use at submit time. |
+| `allowEmpty` | `boolean` | `false` | With `strict`, still accept an empty value (optional fields). |
+
+**Result**
+
+| Field | Type | Present when |
+| --- | --- | --- |
+| `isValid` | `boolean` | always |
+| `normalized` | `string \| undefined` | the number is complete and valid → `"+8801XXXXXXXXX"` |
+| `local` | `string \| undefined` | the number is complete and valid → `"01XXXXXXXXX"` |
+| `operator` | `Operator \| undefined` | three or more digits are known |
+| `error` | `string \| undefined` | `isValid` is `false` |
+| `code` | `PhoneValidationCode \| undefined` | the number is not complete and valid |
+
+**Codes:** `"EMPTY"` · `"INCOMPLETE"` · `"INVALID_OPERATOR"` · `"INVALID_LENGTH"`
+
+### Other core helpers
+
+```ts
+import {
+  isValidPhoneNumber,   // (input) => boolean
+  normalizePhoneNumber, // (input) => "+8801781131905" | undefined
+  formatBdPhoneUi,      // ("01781131905") => "017 8113 1905"
+  sanitizePhoneNumber,  // ("+880 17-8113") => "880178113"
+  toLocalNumber,        // ("+8801781131905") => "01781131905"
+  toInputDigits,        // keystroke-safe variant used by the input
+  detectOperator,       // ("01781131905") => "Grameenphone"
+  OPERATOR_PREFIXES,    // { Grameenphone: ["017", "013"], … }
+  KNOWN_PREFIXES,       // ["017", "013", "019", …]
+  LOCAL_NUMBER_LENGTH,  // 11
+  COUNTRY_CODE,         // "+880"
+} from "bd-number-validator";
 ```
 
-### ✅ Partial Input (Valid until 3 digits)
+### `formatBdPhoneUi(input)`
 
-```json
-{
-  "isValid": true,
-  "operator": "Grameenphone"
-}
-```
+Display grouping only — the stored value stays digits-only.
 
-### ❌ Invalid Operator
-
-```json
-{
-  "isValid": false,
-  "error": "Invalid operator"
-}
-```
-
-### ❌ Invalid Length
-
-```json
-{
-  "isValid": false,
-  "error": "Invalid number"
-}
-```
-
----
-
-## 🎯 7. Formatting Behavior
-
-### UI Formatting (`formatBDPhoneUI`)
-
-The input automatically formats digits as you type:
-
-| Raw Input     | Displayed As    |
-| ------------- | --------------- |
-| `017`         | `017`           |
-| `0178`        | `017 8`         |
-| `01781`       | `017 81`        |
-| `017811`      | `017 811`       |
-| `0178113`     | `017 8113`      |
-| `01781131`    | `017 8113 1`    |
-| `017811319`   | `017 8113 19`   |
-| `0178113190`  | `017 8113 190`  |
+| Digits | Displayed |
+| --- | --- |
+| `017` | `017` |
+| `0178113` | `017 8113` |
 | `01781131905` | `017 8113 1905` |
 
-**Note:** Formatting is only for display. The actual value stored is numeric only.
+---
+
+## React API
+
+### `<PhoneInputBd />`
+
+Controlled, uncontrolled, or anywhere in between.
+
+```tsx
+// Controlled — you own the state
+const [phone, setPhone] = useState("");
+<PhoneInputBd value={phone} onChange={setPhone} />
+
+// Uncontrolled — the component owns it
+<PhoneInputBd defaultValue="01781131905" />
+```
+
+`value` is genuinely controlled: change it from outside and the field follows.
+`defaultValue` seeds an uncontrolled field once and is ignored afterwards.
+
+#### What `onChange` gives you
+
+```tsx
+<PhoneInputBd
+  value={phone}
+  onChange={(value, details) => {
+    value;              // "01781131905"     ← digits, feed straight back into `value`
+    details.formatted;  // "017 8113 1905"   ← what the user sees
+    details.normalized; // "+8801781131905"  ← undefined until complete
+    details.operator;   // "Grameenphone"
+    details.isValid;    // true
+    details.code;       // undefined | "INCOMPLETE" | …
+  }}
+/>
+```
+
+The first argument is **always the digits**, never the formatted string — so
+`onChange={setPhone}` round-trips correctly. The canonical `+880…` value lives
+on `details.normalized`.
+
+| Value | Example | Where |
+| --- | --- | --- |
+| Display value | `017 8113 1905` | inside the `<input>`, and `details.formatted` |
+| Stored value | `01781131905` | first `onChange` argument, and the `value` prop |
+| Normalized value | `+8801781131905` | `details.normalized` — submit this |
+
+### `useBdPhone(options?)`
+
+The same logic, without any markup.
+
+```tsx
+const phone = useBdPhone({ defaultValue: "01781131905" });
+
+phone.raw;        // "01781131905"
+phone.formatted;  // "017 8113 1905"
+phone.normalized; // "+8801781131905"
+phone.operator;   // "Grameenphone"
+phone.error;      // undefined
+phone.isValid;    // true
+phone.isComplete; // true
+phone.onChange("019 1111 1111");
+phone.reset();
+```
+
+Controlled usage works here too: `useBdPhone({ value, onChange: setValue })`.
 
 ---
 
-## 🔧 8. React Hook Form Integration
+## Styling
 
-### ✅ Method A: With Controller (Recommended)
+The component ships its styles **inline**, so it looks right the moment you
+render it and it can never leak rules into your app. There are three ways to
+change how it looks, and you can mix them freely.
 
-```javascript
-import "bd-number-validator/react/style.css";
+### 1. `styles` — per-slot style objects
+
+```tsx
+<PhoneInputBd
+  value={phone}
+  onChange={setPhone}
+  styles={{
+    input: { fontSize: 16 },
+    inputWrapper: { borderRadius: 12 },
+  }}
+/>
+```
+
+Any slot may also be a function of the live state:
+
+```tsx
+<PhoneInputBd
+  styles={{
+    inputWrapper: ({ hasError, isFocused }) => ({
+      borderColor: hasError ? "#ef4444" : isFocused ? "#2563eb" : "#d1d5db",
+      boxShadow: isFocused ? "0 0 0 3px rgba(37,99,235,0.15)" : "none",
+    }),
+  }}
+/>
+```
+
+The state object is `{ isValid, hasError, isFocused, isDisabled, isReadOnly, isComplete }`.
+
+### 2. `classNames` — per-slot classes (Tailwind, CSS modules, anything)
+
+```tsx
+<PhoneInputBd
+  className="mb-4"
+  classNames={{
+    label: "block text-sm font-medium text-gray-700 mb-2",
+    inputWrapper:
+      "flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 focus-within:ring-2",
+    flag: "w-6 h-4",
+    prefix: "text-gray-600 font-medium",
+    input: "flex-1 outline-none text-gray-900",
+    error: "text-sm text-red-600 mt-1",
+  }}
+  unstyled
+/>
+```
+
+`unstyled` drops every built-in style so your classes start from zero.
+`className` goes on the outer container.
+
+### 3. CSS custom properties — theme without touching props
+
+```css
+.signup-form {
+  --phone-input-bd-border: #d1d5db;
+  --phone-input-bd-border-focus: #16a34a;
+  --phone-input-bd-border-error: #ef4444;
+  --phone-input-bd-radius: 12px;
+  --phone-input-bd-bg: #ffffff;
+  --phone-input-bd-color: #111827;
+  --phone-input-bd-label-color: #374151;
+  --phone-input-bd-prefix-color: #1f2937;
+  --phone-input-bd-error-color: #dc2626;
+  --phone-input-bd-font-size: 16px;
+  --phone-input-bd-padding: 10px 12px;
+  --phone-input-bd-gap: 4px;
+}
+```
+
+The full list is exported as `CSS_VARIABLES`.
+
+### Slots
+
+`container` · `label` · `inputWrapper` · `flag` · `prefix` · `input` · `error` —
+the same seven names in `styles` and in `classNames`.
+
+### The flag
+
+`BdFlag` is an inline SVG drawn to the official proportions (10:6 field, disc
+radius ⅕ of the length, centered at ⁹⁄₂₀). No image request, no asset file, no
+stylesheet. Replace or remove it freely:
+
+```tsx
+<PhoneInputBd flag={<img src="/bd.png" alt="" width={24} />} />
+<PhoneInputBd flag={null} prefix={null} />
+<BdFlag width={24} height={15} title="Bangladesh" />
+```
+
+---
+
+## Form libraries
+
+![React Hook Form integration: react-hook-form and Controller live in your app and are optional; they connect to PhoneInputBd through a plain value and onChange pair. The package never imports react-hook-form.](docs/form-integration.svg)
+
+> **React Hook Form is not required by this package.** It is not a dependency,
+> not a peer dependency, and not bundled. `PhoneInputBd` is a plain controlled
+> input — anything that can hand it a `value` and an `onChange` works.
+
+### React Hook Form
+
+```tsx
 import { Controller, useForm } from "react-hook-form";
-import { BDPhoneInput, validatePhoneNumber } from "bd-number-validator";
+import { PhoneInputBd } from "bd-number-validator/react";
+import { validatePhoneNumber } from "bd-number-validator";
 
-export default function Form() {
-  const { control, handleSubmit } = useForm();
-
-  const onSubmit = (values) => console.log(values);
+export function Form() {
+  const { control, handleSubmit } = useForm({ defaultValues: { phone: "" } });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit((values) => console.log(values))}>
       <Controller
         name="phone"
         control={control}
         rules={{
-          validate: (v) => {
-            const r = validatePhoneNumber(v || "");
-            return r.isValid || r.error || "Invalid phone number";
+          validate: (value) => {
+            const result = validatePhoneNumber(value ?? "", { strict: true });
+            return result.isValid || result.error || "Invalid phone number";
           },
         }}
         render={({ field, fieldState }) => (
-          <BDPhoneInput
+          <PhoneInputBd
+            label="Mobile number"
             value={field.value}
-            onValueChange={field.onChange}
-            showError={!!fieldState.error}
-            renderError={() => (
-              <span className="text-red-600">{fieldState.error?.message}</span>
-            )}
+            onChange={field.onChange}
+            onBlur={field.onBlur}
+            name={field.name}
+            error={fieldState.error?.message}
           />
         )}
       />
-
-      <button type="submit">Submit</button>
+      <button type="submit">Continue</button>
     </form>
   );
 }
 ```
 
-### ✅ Method B: Without Controller (Simplest)
+Passing `error` hands the message display over to your form library. Convert to
+the canonical form on submit with `validatePhoneNumber(values.phone).normalized`.
 
-```javascript
-import "bd-number-validator/react/style.css";
-import { useForm } from "react-hook-form";
-import { BDPhoneInput, validatePhoneNumber } from "bd-number-validator";
+### Formik
 
-export default function Form() {
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    getValues,
-    formState: { errors },
-  } = useForm();
-
-  const submit = (data) => {
-    const result = validatePhoneNumber(data.phone);
-    console.log("Final normalized:", result.normalized);
-  };
-
-  return (
-    <form onSubmit={handleSubmit(submit)}>
-      <BDPhoneInput
-        value={getValues("phone")}
-        onValueChange={(v) => setValue("phone", v ?? "")}
-        showError={!!errors.phone}
-        renderError={() => (
-          <span className="text-red-600">{errors.phone?.message}</span>
-        )}
-      />
-
-      <input
-        type="hidden"
-        {...register("phone", {
-          validate: (v) => {
-            const r = validatePhoneNumber(v || "");
-            return r.isValid || r.error || "Invalid phone number";
-          },
-        })}
-      />
-
-      <button type="submit">Submit</button>
-    </form>
-  );
-}
+```tsx
+<Formik initialValues={{ phone: "" }} onSubmit={console.log}>
+  {({ values, setFieldValue, errors }) => (
+    <PhoneInputBd
+      value={values.phone}
+      onChange={(value) => setFieldValue("phone", value)}
+      error={errors.phone}
+    />
+  )}
+</Formik>
 ```
 
----
+### Native form
 
-## 🎨 9. Styling Examples
-
-### Example 1: Modern Card Style
-
-```javascript
-<BDPhoneInput
-  containerClass="max-w-md"
-  labelClass="block text-sm font-semibold text-gray-800 mb-2"
-  wrapperClass="flex items-center gap-3 bg-white border-2 border-gray-200 rounded-xl px-4 py-3 shadow-sm hover:border-blue-400 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100 transition-all"
-  flagClass="w-7 h-5 rounded"
-  prefixClass="text-gray-700 font-semibold text-base"
-  inputClass="flex-1 outline-none text-gray-900 text-base placeholder-gray-400"
-  errorClass="text-sm text-red-500 mt-2 ml-1"
-/>
-```
-
-### Example 2: Minimal Style
-
-```javascript
-<BDPhoneInput
-  showLabel={false}
-  wrapperClass="flex items-center gap-2 border-b-2 border-gray-300 pb-2 focus-within:border-blue-500 transition-colors"
-  flagClass="w-6 h-4"
-  prefixClass="text-gray-500"
-  inputClass="flex-1 outline-none bg-transparent"
-  errorClass="text-xs text-red-500 mt-1"
-/>
-```
-
-### Example 3: Dark Mode
-
-```javascript
-<BDPhoneInput
-  containerClass="bg-gray-900 p-6 rounded-lg"
-  labelClass="text-gray-300 text-sm mb-2 block"
-  wrapperClass="flex items-center gap-3 bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/50"
-  flagClass="w-6 h-4"
-  prefixClass="text-gray-400 font-medium"
-  inputClass="flex-1 outline-none bg-transparent text-white placeholder-gray-500"
-  errorClass="text-sm text-red-400 mt-2"
-/>
-```
-
----
-
-## 💡 10. Advanced Usage
-
-### Controlled Component with External State
-
-```javascript
-import "bd-number-validator/react/style.css";
-import { useState } from "react";
-import { BDPhoneInput } from "bd-number-validator";
-
-export default function App() {
+```tsx
+function NativeForm() {
   const [phone, setPhone] = useState("");
 
   return (
-    <div>
-      <BDPhoneInput value={phone} onValueChange={setPhone} />
-
-      <button onClick={() => console.log(phone)}>Submit: {phone}</button>
-    </div>
+    <form
+      onSubmit={(event) => {
+        event.preventDefault();
+        const result = validatePhoneNumber(phone, { strict: true });
+        if (!result.normalized) return alert(result.error);
+        fetch("/api/signup", {
+          method: "POST",
+          body: JSON.stringify({ phone: result.normalized }),
+        });
+      }}
+    >
+      <PhoneInputBd name="phone" required value={phone} onChange={setPhone} />
+      <button type="submit">Sign up</button>
+    </form>
   );
 }
 ```
 
-### Multiple Phone Inputs
+### Any other state manager
 
-```javascript
-export default function App() {
-  const [primary, setPrimary] = useState("");
-  const [secondary, setSecondary] = useState("");
+Zustand, Redux, Jotai, a reducer — it is the same `{ value, onChange }` pair.
+
+---
+
+## Custom UI
+
+![Custom UI: useBdPhone returns raw, formatted, normalized, operator, error, isValid, isComplete, onChange and reset, which you wire into your own input, operator badge and error text.](docs/custom-ui.svg)
+
+If you do not want the packaged markup, skip it. `useBdPhone` gives you the
+whole state machine and no DOM.
+
+```tsx
+import { useBdPhone } from "bd-number-validator/react";
+
+export function MyPhoneField() {
+  const phone = useBdPhone();
 
   return (
     <div>
-      <BDPhoneInput
-        label="Primary Phone"
-        value={primary}
-        onValueChange={setPrimary}
+      <input
+        value={phone.formatted}
+        onChange={(event) => phone.onChange(event.target.value)}
+        placeholder="017 8113 1905"
+        inputMode="numeric"
+        autoComplete="tel"
       />
 
-      <BDPhoneInput
-        label="Secondary Phone"
-        value={secondary}
-        onValueChange={setSecondary}
-      />
+      {phone.operator && <span className="badge">{phone.operator}</span>}
+      {phone.error && <p className="error">{phone.error}</p>}
+      {phone.isComplete && <small>Will submit {phone.normalized}</small>}
     </div>
   );
 }
 ```
 
+Or go one level lower and use the core functions on your own state — the hook is
+a convenience, not a requirement.
+
 ---
 
-## 🚀 11. TypeScript Support
+## Server-side usage
 
-All components and functions are fully typed:
+The root entry has no React in it, so this adds nothing React-shaped to a server
+bundle.
 
-```typescript
-import "bd-number-validator/react/style.css";
-import {
-  BDPhoneInput,
-  useBDPhone,
-  validatePhoneNumber,
+### Express
+
+```js
+import express from "express";
+import { validatePhoneNumber } from "bd-number-validator/validate";
+
+const app = express();
+
+app.post("/api/otp", express.json(), (req, res) => {
+  const result = validatePhoneNumber(req.body.phone ?? "", { strict: true });
+
+  if (!result.normalized) {
+    return res.status(400).json({ error: result.error, code: result.code });
+  }
+
+  sendOtp(result.normalized);
+  res.json({ ok: true, operator: result.operator });
+});
+```
+
+### Next.js route handler
+
+```ts
+import { NextResponse } from "next/server";
+import { validatePhoneNumber } from "bd-number-validator";
+
+export async function POST(request: Request) {
+  const { phone } = await request.json();
+  const result = validatePhoneNumber(phone ?? "", { strict: true });
+
+  if (!result.normalized) {
+    return NextResponse.json({ error: result.error }, { status: 400 });
+  }
+
+  return NextResponse.json({ phone: result.normalized });
+}
+```
+
+### Bulk cleanup
+
+```ts
+const cleaned = rows
+  .map((row) => normalizePhoneNumber(row.phone))
+  .filter((value): value is string => value !== undefined);
+```
+
+---
+
+## Accessibility
+
+`PhoneInputBd` is wired for assistive technology out of the box:
+
+- The `label` is a real `<label htmlFor>` bound to the input; an auto-generated
+  `id` is used unless you pass one.
+- The error message carries `role="alert"` and is linked through
+  `aria-describedby`. A caller-supplied `aria-describedby` is preserved and the
+  error id is appended.
+- `aria-invalid="true"` is set whenever an error is shown, so the state is not
+  communicated by color alone.
+- `type="tel"`, `inputMode="numeric"` and `autoComplete="tel"` by default —
+  correct mobile keyboard, correct autofill. Both are overridable.
+- `disabled`, `readOnly`, `required`, `name`, `onFocus`, `onBlur` and every
+  other native input attribute are forwarded to the `<input>`.
+- `ref` is forwarded to the underlying `<input>`.
+- `BdFlag` is decorative by default (`aria-hidden`) and becomes an
+  `role="img"` with a `<title>` when you pass one.
+
+```tsx
+<PhoneInputBd
+  id="phone"
+  name="phone"
+  label="Mobile number"
+  aria-describedby="phone-hint"
+  required
+  value={phone}
+  onChange={setPhone}
+/>
+<p id="phone-hint">We only use this for delivery updates.</p>
+```
+
+---
+
+## TypeScript
+
+Types ship with the package — nothing to install.
+
+```ts
+import type {
+  Operator,               // "Grameenphone" | "Banglalink" | … | "Unknown"
+  KnownOperator,          // the same without "Unknown"
   PhoneValidationResult,
+  PhoneValidationCode,
+  ValidatePhoneNumberOptions,
 } from "bd-number-validator";
 
-const result: PhoneValidationResult = validatePhoneNumber("01781131905");
-
-const MyComponent = () => {
-  const { raw, isValid, normalized } = useBDPhone("");
-
-  return <BDPhoneInput onValueChange={(v?: string) => console.log(v)} />;
-};
+import type {
+  PhoneInputBdProps,
+  PhoneInputBdStyles,
+  PhoneInputBdClassNames,
+  PhoneInputBdState,
+  PhoneInputBdSlot,
+  PhoneInputBdStyleValue,
+  PhoneChangeDetails,
+  UseBdPhoneOptions,
+  UseBdPhoneReturn,
+  BdFlagProps,
+} from "bd-number-validator/react";
 ```
 
----
-
-## 📄 License
-
-MIT © Muhammad Rashed
+Verified against `moduleResolution` `bundler`, `node16` and `node` (classic).
 
 ---
 
-## 🤝 Contributing
+## API reference
 
-Pull requests, issues, and feedback are welcome!
+### Exports
 
-**GitHub Repository:** [https://github.com/mrashed21/bd-number-validator](https://github.com/mrashed21/bd-number-validator)
+| API | Kind | Entry | Purpose |
+| --- | --- | --- | --- |
+| `validatePhoneNumber` | function | core | Validate, normalize and identify a number |
+| `isValidPhoneNumber` | function | core | `boolean` shortcut for a complete number |
+| `normalizePhoneNumber` | function | core | `"+8801…"` or `undefined` |
+| `formatBdPhoneUi` | function | core | Display grouping `017 8113 1905` |
+| `sanitizePhoneNumber` | function | core | Strip everything but digits |
+| `toLocalNumber` | function | core | Canonical `01XXXXXXXXX` form |
+| `toInputDigits` | function | core | Keystroke-safe digits for an input field |
+| `detectOperator` | function | core | Operator from a local number |
+| `OPERATOR_PREFIXES` | const | core | Prefix table by operator |
+| `KNOWN_PREFIXES` | const | core | Flat list of accepted prefixes |
+| `LOCAL_NUMBER_LENGTH` | const | core | `11` |
+| `COUNTRY_CODE` | const | core | `"+880"` |
+| `PhoneInputBd` | component | react | Ready-to-use input |
+| `BdFlag` | component | react | Inline Bangladesh flag SVG |
+| `useBdPhone` | hook | react | Headless state + validation |
+| `CSS_VARIABLES` | const | react | Names of the supported CSS custom properties |
+| `getDefaultStyles` | function | react | The built-in style objects, for extending |
+| `resolveStyle` | function | react | Resolve a style value against a state |
 
-### Development
+### `<PhoneInputBd />` props
+
+#### Value
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `string` | — | Controlled digits. Any accepted shape is normalized on the way in. |
+| `defaultValue` | `string` | `""` | Initial value for uncontrolled usage. |
+| `onChange` | `(value: string, details: PhoneChangeDetails) => void` | — | Digits first, full validation details second. |
+
+#### Content
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | `ReactNode` | — | Label content. Omit for no label. |
+| `error` | `ReactNode` | — | Replaces the built-in message. `null`/`false` suppresses it. |
+| `showError` | `boolean` | `true` | Allow the built-in validation message. |
+| `flag` | `ReactNode` | `<BdFlag />` | Custom flag, or `null` to hide. |
+| `prefix` | `ReactNode` | `"+880"` | Custom prefix, or `null` to hide. |
+
+#### Appearance
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `className` | `string` | — | Class for the outer container. |
+| `classNames` | `PhoneInputBdClassNames` | `{}` | Per-slot classes. |
+| `styles` | `PhoneInputBdStyles` | `{}` | Per-slot style objects or state functions. |
+| `unstyled` | `boolean` | `false` | Drop every built-in style. |
+
+#### Native
+
+Everything else is forwarded to the `<input>`: `id`, `name`, `placeholder`
+(default `"017 8113 1905"`), `disabled`, `readOnly`, `required`, `autoComplete`
+(default `"tel"`), `inputMode` (default `"numeric"`), `onFocus`, `onBlur`,
+`aria-*`, `data-*`, and `ref`.
+
+`type` is fixed to `"tel"`. `style` and the native `prefix` attribute are
+replaced by the `styles` and `prefix` props above.
+
+### `useBdPhone(options?)`
+
+| Option | Type | Description |
+| --- | --- | --- |
+| `value` | `string` | Controlled value. |
+| `defaultValue` | `string` | Uncontrolled initial value. |
+| `onChange` | `(value: string, details: PhoneChangeDetails) => void` | Change callback. |
+
+| Returns | Type | Description |
+| --- | --- | --- |
+| `raw` | `string` | Digits currently entered. |
+| `formatted` | `string` | `017 8113 1905`. |
+| `normalized` | `string \| undefined` | `+8801781131905` once complete. |
+| `local` | `string \| undefined` | `01781131905` once complete. |
+| `operator` | `Operator \| undefined` | From three digits onwards. |
+| `error` | `string \| undefined` | Current message, if any. |
+| `code` | `PhoneValidationCode \| undefined` | Machine-readable status. |
+| `isValid` | `boolean` | Acceptable so far. |
+| `isComplete` | `boolean` | Complete and valid — safe to submit. |
+| `onChange` | `(value: string) => void` | Update the value. |
+| `reset` | `() => void` | Clear the value. |
+
+---
+
+## Supported input formats
+
+| Input | Normalized | Valid |
+| --- | --- | --- |
+| `01781131905` | `+8801781131905` | ✅ |
+| `1781131905` | `+8801781131905` | ✅ |
+| `8801781131905` | `+8801781131905` | ✅ |
+| `+8801781131905` | `+8801781131905` | ✅ |
+| `017 8113-1905` | `+8801781131905` | ✅ |
+| `(017) 8113.1905` | `+8801781131905` | ✅ |
+| `01211111111` | — | ❌ `INVALID_OPERATOR` |
+| `0178113190` (10 digits) | — | ❌ `INCOMPLETE` |
+| `017811319055` (12 digits) | — | ❌ `INVALID_LENGTH` |
+| `""` | — | ❌ `EMPTY` (accepted in non-strict mode) |
+
+### Operators
+
+| Operator | Prefixes |
+| --- | --- |
+| Grameenphone | `017`, `013` |
+| Banglalink | `019`, `014` |
+| Robi | `018` |
+| Airtel | `016` |
+| Teletalk | `015` |
+
+Exported as `OPERATOR_PREFIXES` if you need the table at runtime.
+
+---
+
+## Limitations
+
+- **Mobile numbers only.** Landline / PSTN numbers such as `02…` are rejected.
+- **Format validation, not delivery.** A well-formed number is not proof of an
+  active SIM. Send an OTP for that.
+- **Number portability.** A ported number keeps the prefix of the operator that
+  issued it, so `operator` reflects the issuing network, not necessarily the one
+  serving the number today.
+- **Bangladesh only.** For international numbers use `libphonenumber-js`.
+- **Latin digits only.** Bengali numerals (`০১৭`) are not interpreted.
+
+---
+
+## Migrating from v1
+
+v2 is a breaking release: names, entry points and the styling model all changed.
+`validatePhoneNumber` itself is unchanged — its old result fields all still
+behave the same way, with `local` and `code` added.
+
+| v1 | v2 |
+| --- | --- |
+| `import { BDPhoneInput } from "bd-number-validator"` | `import { PhoneInputBd } from "bd-number-validator/react"` |
+| `import { useBDPhone } from "bd-number-validator"` | `import { useBdPhone } from "bd-number-validator/react"` |
+| `import "bd-number-validator/react/style.css"` | **delete this line** — styles are inline now |
+| `<BDPhoneInput onValueChange={setPhone} />` | `<PhoneInputBd onChange={(v, d) => setPhone(d.normalized)} />` |
+| `value` (behaved as an initial value) | `defaultValue`, or `value` for real controlled usage |
+| `useBDPhone("01781131905")` | `useBdPhone({ defaultValue: "01781131905" })` |
+| `containerClass` / `wrapperClass` / `inputClass` / … | `classNames={{ container, inputWrapper, input, … }}` |
+| `renderFlag` / `renderPrefix` | `flag={…}` / `prefix={…}` |
+| `renderLabel` / `showLabel` | `label={<YourNode />}`; omit `label` to hide it |
+| `renderError` | `error={<YourNode />}` |
+| `.bdp-*` CSS classes | removed — use `styles`, `classNames` or the CSS variables |
+| `label` defaulted to `"Phone Number"` | no label unless you pass one |
+
+`validatePhoneNumber` keeps working from the root import with no changes.
+
+---
+
+## Contributing
 
 ```bash
-# Clone the repository
-git clone https://github.com/mrashed21/bd-number-validator.git
-cd bd-number-validator
-
-# Install dependencies
 npm install
-
-# Build the package
-npm run build
+npm run typecheck   # tsc --noEmit
+npm test            # vitest — 137 tests
+npm run build       # tsup → dist/
 ```
 
-### Submitting Changes
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/my-feature`)
-3. Commit your changes (`git commit -m 'Add my feature'`)
-4. Push to the branch (`git push origin feature/my-feature`)
-5. Open a Pull Request
+Keep `src/core/` free of React and DOM imports. New operator prefixes need a
+BTRC-citable source in the pull request.
 
 ---
 
-## 📧 Support
+## License
 
-For support and inquiries, contact: **rashedjaman768@gmail.com**
-
----
-
-## 🌟 Show Your Support
-
-If you find this package helpful, please consider giving it a ⭐ on [GitHub](https://github.com/mrashed21/bd-number-validator)!
+MIT © [Muhammad Rashed](https://github.com/mrashed21)
