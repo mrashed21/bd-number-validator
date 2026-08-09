@@ -434,7 +434,7 @@ describe("PhoneInputBd — styling", () => {
     );
     const wrapper = container.querySelector(".wrap") as HTMLElement;
 
-    expect(wrapper.style.boxShadow).toContain("rgba(239, 68, 68, 0.16)");
+    expect(wrapper.style.boxShadow).toContain("rgba(231, 0, 11, 0.2)");
     expect(wrapper.style.boxShadow).not.toContain("color-mix");
   });
 
