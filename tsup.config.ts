@@ -8,7 +8,6 @@ export default defineConfig({
   format: ["esm", "cjs"],
   dts: true,
   clean: true,
-  sourcemap: true,
   treeshake: true,
   external: ["react", "react-dom"],
 });
