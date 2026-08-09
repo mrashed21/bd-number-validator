@@ -1,6 +1,7 @@
 node_modules
 dist
 coverage
+.ui-test/
 *.tgz
 *.log
 npm-debug.log*
