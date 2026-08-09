@@ -1,6 +1,6 @@
 {
   "name": "bd-number-validator",
-  "version": "2.0.1",
+  "version": "2.0.3",
   "description": "Bangladesh mobile number validator with normalization and operator detection, plus an optional zero-config React input (PhoneInputBd) and headless hook. No CSS import, no form library required.",
   "author": "Muhammad Rashed <rashedjaman768@gmail.com>",
   "license": "MIT",
